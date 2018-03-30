@@ -100,7 +100,6 @@ public class ProblemController {
 
 	@PostMapping(value = "/products", params = {"reportId"})
 	public ModelAndView insertProblem(@RequestParam(value = "reportId") long reportId, Model model, ProblemEntity problemEntity, @RequestParam(value = "images[]", required = false) MultipartFile[] images, @RequestParam(value = "attachment", required = false) MultipartFile attachment) {
-		System.out.println(images.length);
 		if (images.length==0  && attachment == null) {
 			problemsService.save(problemEntity, reportId);
 		} else if (images.length > 0 && attachment == null) {

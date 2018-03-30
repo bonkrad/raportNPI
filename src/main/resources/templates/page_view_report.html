@@ -70,6 +70,7 @@
                 <th scope="col">Priorytet</th>
                 <th scope="col">Kategoria</th>
                 <th scope="col">Opis</th>
+                <th scope="col"></th>
                 <th scope="col">Zdjęcia</th>
                 <th scope="col">Zalecenie/ Akcje Assel</th>
                 <th scope="col">Status</th>
@@ -82,6 +83,22 @@
                 <td id="priorityTd" th:text="${problem.priority}">Priority</td>
                 <td id="categoryTd" th:text="${problem.category}">Category</td>
                 <td id="descriptionTd" th:text="${problem.description}">Description</td>
+                <td>
+                    <div th:if="${problem.warning == 1}">
+                        <img class="warning-icon pop-warning" src="img/ctq.png" data-content="Krytyczny dla jakości"
+                             data-placement="right" data-toggle="popover" data-html="true"/>
+                    </div>
+                    <div th:if="${problem.warning == 2}">
+                        <img class="warning-icon pop-warning" src="img/otd.png" data-content="Zagrożenie terminu dostawy"
+                             data-placement="right" data-toggle="popover" data-html="true"/>
+                    </div>
+                    <div th:if="${problem.warning == 3}">
+                        <img class="warning-icon pop-warning" src="img/ctq.png" data-content="Krytyczny dla jakości"
+                             data-placement="right" data-toggle="popover" data-html="true"/><br />
+                        <img class="warning-icon pop-warning" src="img/otd.png" data-content="Zagrożenie terminu dostawy"
+                             data-placement="right" data-toggle="popover" data-html="true"/>
+                    </div>
+                </td>
                 <td id="imgTd">
                     <div th:each="src : ${problem.imgSrc}" class="image">
                         <a target="_blank" th:href="${src}">
@@ -116,6 +133,7 @@
                 <th scope="col">Priorytet</th>
                 <th scope="col">Kategoria</th>
                 <th scope="col">Opis</th>
+                <th scope="col"></th>
                 <th scope="col">Zdjęcia</th>
                 <th scope="col">Zalecenie/ Akcje Assel</th>
                 <th scope="col">Status</th>
@@ -128,6 +146,18 @@
                 <td id="priorityTd" th:text="${problem.priority}">Priority</td>
                 <td id="categoryTd" th:text="${problem.category}">Category</td>
                 <td id="descriptionTd" th:text="${problem.description}">Description</td>
+                <td>
+                    <div th:if="${problem.warning == 1}">
+                        <img class="warning-icon" src="img/ctq.png"/>
+                    </div>
+                    <div th:if="${problem.warning == 2}">
+                        <img class="warning-icon" src="img/otd.png"/>
+                    </div>
+                    <div th:if="${problem.warning == 3}">
+                        <img class="warning-icon" src="img/ctq.png"/><br />
+                        <img class="warning-icon" src="img/otd.png"/>
+                    </div>
+                </td>
                 <td id="imgTd">
                     <div th:each="src : ${problem.imgSrc}" class="image">
                         <a target="_blank" th:href="${src}">
@@ -192,6 +222,23 @@
                 <div class="form-group">
                     <h6 class="h-margin">Podsumowanie ekonomiczne</h6>
                     <p id="economicalSummaryTextArea" th:text="${summary}"></p>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm">
+                <div class="form-group">
+                    <h6 class="h-margin">Załączniki</h6>
+                </div>
+                <div class="row attachment">
+                    <div th:each="src : ${report.attachmentSrc}" class="mr-2 mb-2">
+                        <a target="_blank" th:href="${src}">
+                            <button class="btn btn-outline-secondary pop-button" type="button" data-content="Załącznik"
+                                    data-placement="left" data-toggle="popover" data-html="true">
+                                <img class="glyph-icon" src="img/glyphicons-63-paperclip.png"/>
+                            </button>
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>

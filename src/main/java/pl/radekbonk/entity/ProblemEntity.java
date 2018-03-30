@@ -26,6 +26,7 @@ public class ProblemEntity {
 
 	private int author;
 	private int priority;
+	private int warning;
 
 	private Boolean closed;
 
@@ -130,6 +131,14 @@ public class ProblemEntity {
 
 	public void setPriority(int priority) {
 		this.priority = priority;
+	}
+
+	public int getWarning() {
+		return warning;
+	}
+
+	public void setWarning(int warning) {
+		this.warning = warning;
 	}
 
 	public Boolean getClosed() {

@@ -8,6 +8,7 @@ import org.apache.poi.util.IOUtils;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import pl.radekbonk.Main;
 import pl.radekbonk.entity.ProblemEntity;
 import pl.radekbonk.entity.ReportEntity;
@@ -20,6 +21,7 @@ import java.io.*;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -62,13 +64,16 @@ public class ReportsService {
 		return reportRepository.findFirstByProductIdOrderByRevisionDesc(id);
 	}
 
-	public void save(ReportEntity reportEntity) {
+	public void save(ReportEntity reportEntity, MultipartFile[] attachment, String[] attachmentsToDelete) {
+		reportEntity = removeAttachement(reportEntity,attachmentsToDelete);
+		reportEntity = reportWithAttachment(reportEntity,attachment);
 		reportRepository.save(reportEntity);
 	}
 
 	public void save(ReportEntity reportEntity, boolean copyLast, long productId) {
 		ReportEntity oldReport = findHighestRevision(productId);
 		if (copyLast) {
+			//reportEntity.setAttachmentSrc(oldReport.getAttachmentSrc());
 			reportEntity.setConclusion(oldReport.getConclusion());
 			reportEntity.setSummary(oldReport.getSummary());
 		}
@@ -76,6 +81,45 @@ public class ReportsService {
 		if (copyLast) {
 			copyProblemsFormLastReports(productId, oldReport.getId(), reportEntity.getId());
 		}
+	}
+
+	public ReportEntity removeAttachement(ReportEntity reportEntity, String[] attachmentToDelete) {
+		List<String> attSrc = reportEntity.getAttachmentSrc();
+		for (String attUrl : attachmentToDelete) {
+			if (attSrc.contains(attUrl)) {
+				attSrc.remove(attUrl);
+			} else {
+				System.out.println("Problem doesn't contain this attachement");
+			}
+		}
+		return reportEntity;
+	}
+
+	public ReportEntity reportWithAttachment(ReportEntity reportEntity, MultipartFile[] attachments) {
+		long productId = reportEntity.getProduct().getId();
+		List<String> attachmentSources = reportEntity.getAttachmentSrc();
+		if(attachments.length > 0) {
+			for (MultipartFile attachment : attachments) {
+				try {
+					String realPathToUploads = Main.getUploadPath() + productId + "/";
+					System.out.println(realPathToUploads);
+					if (!new File(realPathToUploads).exists()) {
+						new File(realPathToUploads).mkdir();
+					}
+					UUID uuid = UUID.randomUUID();
+					String filePath = realPathToUploads + "/" + uuid + attachment.getOriginalFilename().replace(" ", "");
+					File dest = new File(filePath);
+					//image.transferTo(dest);
+					attachment.transferTo(dest);
+					attachmentSources.add("/disk/" + productId + "/" + uuid + attachment.getOriginalFilename().replace(" ", ""));
+
+				} catch (Exception e) {
+					System.out.println(e);
+				}
+				reportEntity.setAttachmentSrc(attachmentSources);
+			}
+		}
+		return reportEntity;
 	}
 
 	public BigDecimal getNewRevision(long productId) {

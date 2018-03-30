@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 import pl.radekbonk.entity.ProblemEntity;
 import pl.radekbonk.entity.ReportEntity;
@@ -17,6 +18,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 
 @Controller
 @RequestMapping("/")
@@ -56,6 +58,7 @@ public class ReportController {
 			model.addAttribute("tasks", tasksService.findByReportId(reportId));
 			model.addAttribute("summary", report.getSummary());
 			model.addAttribute("conclusion", report.getConclusion());
+			model.addAttribute("report",reportsService.findOne(reportId));
 			return new ModelAndView("page_view_report");
 		} catch (NullPointerException e) {
 			System.out.println("No such a report");
@@ -87,7 +90,7 @@ public class ReportController {
 	@ResponseBody
 	public String createReport(@RequestParam(value = "productId") long productId, @RequestParam(value= "copyLast") boolean copyLast) {
 		System.out.println(copyLast);
-		ReportEntity newReport = new ReportEntity(reportsService.getNewRevision(productId), 1682, "", "", "", "");
+		ReportEntity newReport = new ReportEntity(reportsService.getNewRevision(productId), 1682, "", new ArrayList<>(), "", "");
 		newReport.setProduct(productsService.getProductById(productId));
 		reportsService.save(newReport,copyLast, productId);
 		return "/products?productId="+productId+"&reportId="+ newReport.getId();
@@ -100,15 +103,16 @@ public class ReportController {
 		model.addAttribute("summary", report.getSummary());
 		model.addAttribute("conclusion", report.getConclusion());
 		model.addAttribute("reportId", reportId);
+		model.addAttribute("report", report);
 		return "summary :: summaryFragment";
 	}
 
 	@PostMapping(value="/report", params= {"reportId"})
-	public ModelAndView saveReport(@RequestParam(value = "reportId") long reportId, @RequestParam(value = "summary") String summary, @RequestParam(value = "conclusion") String conclusion) {
+	public ModelAndView saveReport(@RequestParam(value = "reportId") long reportId, @RequestParam(value = "summary") String summary, @RequestParam(value = "conclusion") String conclusion, @RequestParam(value = "attachment[]", required = false) MultipartFile[] attachments,@RequestParam(value = "attachmentsToDelete[]", required = false) String[] attachmentsToDelete) {
 		ReportEntity reportEntity = reportsService.findOne(reportId);
 		reportEntity.setSummary(summary);
 		reportEntity.setConclusion(conclusion);
-		reportsService.save(reportEntity);
+		reportsService.save(reportEntity,attachments,attachmentsToDelete);
 		return new ModelAndView("redirect:/report?reportId=" + reportId);
 	}
 

@@ -7,13 +7,34 @@
 <body>
 <div th:fragment="summaryFragment">
     <div class="row">
-        <div class="col-sm">
+        <div class="col-sm-8">
             <div class="form-group">
                 <label for="economicalSummaryTextArea">Podsumowanie ekonomiczne</label>
                 <textarea class="form-control" th:value="@{/report(reportId=${reportId})}"
                           placeholder="-Straty materiałowe -Czas poświęcony na przygotowania -Czas produkcji"
                           id="economicalSummaryTextArea" rows="5" th:text="${summary}"></textarea>
             </div>
+        </div>
+        <div class="col-sm-4">
+            <div class="form-group">
+                <label for="economicalSummaryFileInput">Załączniki</label>
+                <input type="file" class="form-control-file" id="economicalSummaryFileInput" multiple="multiple"/>
+            </div>
+            <div class="row attachment">
+                <div th:each="src : ${report.attachmentSrc}" class="mr-2 mb-2">
+                <a target="_blank" th:href="${src}">
+                    <button class="btn btn-outline-secondary pop-button" type="button" data-content="Załącznik"
+                            data-placement="left" data-toggle="popover" data-html="true">
+                        <img class="glyph-icon" src="img/glyphicons-63-paperclip.png"/>
+                    </button>
+                </a>
+                <img class="remove-attachment-image" src="img/glyphicons-208-remove.png" />
+                </div>
+            </div>
+            <button class="btn btn-outline-secondary btnSaveSummaryAttachment"
+                    th:value="@{/report(reportId=${reportId})}"
+                    type="submit">Zapisz załączniki
+            </button>
         </div>
     </div>
     <div class="row">

@@ -3,6 +3,7 @@ package pl.radekbonk.entity;
 import javax.persistence.*;
 import java.math.BigDecimal;
 import java.util.Calendar;
+import java.util.List;
 
 @Entity
 public class ReportEntity {
@@ -19,7 +20,10 @@ public class ReportEntity {
 	private int author;
 
 	private String imgSrc;
-	private String attachmentSrc;
+
+	@ElementCollection
+	private List<String> attachmentSrc;
+
 	private String summary;
 	private String conclusion;
 
@@ -30,7 +34,7 @@ public class ReportEntity {
 
 	}
 
-	public ReportEntity(BigDecimal revision, int author, String imgSrc, String attachmentSrc, String summary, String conclusion) {
+	public ReportEntity(BigDecimal revision, int author, String imgSrc, List<String> attachmentSrc, String summary, String conclusion) {
 		this.revision = revision;
 		this.author = author;
 		this.imgSrc = imgSrc;
@@ -80,11 +84,11 @@ public class ReportEntity {
 		this.imgSrc = imgSrc;
 	}
 
-	public String getAttachmentSrc() {
+	public List<String> getAttachmentSrc() {
 		return attachmentSrc;
 	}
 
-	public void setAttachmentSrc(String attachmentSrc) {
+	public void setAttachmentSrc(List<String> attachmentSrc) {
 		this.attachmentSrc = attachmentSrc;
 	}
 

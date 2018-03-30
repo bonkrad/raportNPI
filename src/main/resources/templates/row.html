@@ -20,6 +20,7 @@
             <th scope="col">Priorytet</th>
             <th scope="col">Kategoria</th>
             <th scope="col">Opis</th>
+            <th scope="col"></th>
             <th scope="col">Zdjęcia</th>
             <th scope="col">Zalecenie/ Akcje Assel</th>
             <th scope="col">Status</th>
@@ -27,7 +28,8 @@
         </tr>
         </thead>
         <tbody>
-        <tr th:each="problem,iterationStatus : ${majorProblems}" th:classappend="${problem.closed == false}?table-danger:table-success">
+        <tr th:each="problem,iterationStatus : ${majorProblems}"
+            th:classappend="${problem.closed == false}?table-danger:table-success">
             <th th:text="${iterationStatus.count}" scope="row" class="pop-row"
                 th:attr="data-content=${problem.timestamp.getTime().toString()}, data-original-title=${problem.author}"
                 data-placement="left"
@@ -35,7 +37,24 @@
             </th>
             <td id="priorityTd" th:text="${problem.priority}">Priority</td>
             <td id="categoryTd" th:text="${problem.category}">Category</td>
-            <td id="descriptionTd" th:text="${problem.description}">Description</td>
+            <td id="descriptionTd" th:text="${problem.description}">Description
+            </td>
+            <td id="warningTd">
+                <div th:if="${problem.warning == 1}" id="warning1">
+                    <img id="ctqIcon" class="warning-icon pop-warning" src="img/ctq.png" data-content="Krytyczny dla jakości"
+                         data-placement="right" data-toggle="popover" data-html="true"/>
+                </div>
+                <div th:if="${problem.warning == 2}" id="warning2">
+                    <img id="otdIcon" class="warning-icon pop-warning" src="img/otd.png" data-content="Zagrożenie terminu dostawy"
+                         data-placement="right" data-toggle="popover" data-html="true"/>
+                </div>
+                <div th:if="${problem.warning == 3}" id="warning3">
+                    <img id="ctqIcon" class="warning-icon pop-warning" src="img/ctq.png" data-content="Krytyczny dla jakości"
+                         data-placement="right" data-toggle="popover" data-html="true"/><br />
+                    <img id="otdIcon" class="warning-icon pop-warning" src="img/otd.png" data-content="Zagrożenie terminu dostawy"
+                         data-placement="right" data-toggle="popover" data-html="true"/>
+                </div>
+            </td>
             <td id="imgTd">
                 <div th:each="src : ${problem.imgSrc}" class="image">
                     <a target="_blank" th:href="${src}">
@@ -96,6 +115,7 @@
             <th scope="col">Priorytet</th>
             <th scope="col">Kategoria</th>
             <th scope="col">Opis</th>
+            <th scope="col"></th>
             <th scope="col">Zdjęcia</th>
             <th scope="col">Zalecenie/ Akcje Assel</th>
             <th scope="col">Status</th>
@@ -103,7 +123,8 @@
         </tr>
         </thead>
         <tbody>
-        <tr th:each="problem,iterationStatus : ${minorProblems}" th:classappend="${problem.closed == false}?table-danger:table-success">
+        <tr th:each="problem,iterationStatus : ${minorProblems}"
+            th:classappend="${problem.closed == false}?table-danger:table-success">
             <th th:text="${iterationStatus.count}" scope="row" class="pop-row"
                 th:attr="data-content=${problem.timestamp.getTime().toString()}, data-original-title=${problem.author}"
                 data-placement="left"
@@ -112,6 +133,22 @@
             <td id="priorityTd" th:text="${problem.priority}">Priority</td>
             <td id="categoryTd" th:text="${problem.category}">Category</td>
             <td id="descriptionTd" th:text="${problem.description}">Description</td>
+            <td id="warningTd">
+                <div th:if="${problem.warning == 1}" id="warning1">
+                    <img id="ctqIcon" class="warning-icon pop-warning" src="img/ctq.png" data-content="Krytyczny dla jakości"
+                         data-placement="right" data-toggle="popover" data-html="true"/>
+                </div>
+                <div th:if="${problem.warning == 2}" id="warning2">
+                    <img id="otdIcon" class="warning-icon pop-warning" src="img/otd.png" data-content="Zagrożenie terminu dostawy"
+                         data-placement="right" data-toggle="popover" data-html="true"/>
+                </div>
+                <div th:if="${problem.warning == 3}" id="warning3">
+                    <img id="ctqIcon" class="warning-icon pop-warning" src="img/ctq.png" data-content="Krytyczny dla jakości"
+                         data-placement="right" data-toggle="popover" data-html="true"/><br />
+                    <img id="otdIcon" class="warning-icon pop-warning" src="img/otd.png" data-content="Zagrożenie terminu dostawy"
+                         data-placement="right" data-toggle="popover" data-html="true"/>
+                </div>
+            </td>
             <td id="imgTd">
                 <div th:each="src : ${problem.imgSrc}" class="image">
                     <a target="_blank" th:href="${src}">

@@ -67,14 +67,33 @@
               method="post"
               id="problemForm">
             <div class="row">
-                <div class="col-xl-6">
+                <div class="col-xl-5 col-md-8">
                     <div class="form-group">
                         <label for="descriptionTextArea">Opis</label>
                         <textarea name="description" class="form-control" id="descriptionTextArea" rows="3"
                                   th:field="*{description}"></textarea>
                     </div>
                 </div>
-                <div class="col-xl-6">
+                <div class="col-xl-2 col-md-4">
+                    <div class="form-group">
+                        <label>Zagrożenie</label>
+                        <div class="form-check m-2">
+                            <input class="form-check-input" type="checkbox" id="gridCheck1" value="1" />
+                            <label class="form-check-label" for="gridCheck1">
+                                <img class="warning-icon pop-warning" src="img/ctq.png" data-content="Krytyczny dla jakości"
+                                     data-placement="right" data-toggle="popover" data-html="true"/>
+                            </label>
+                        </div>
+                        <div class="form-check m-2">
+                            <input class="form-check-input" type="checkbox" id="gridCheck2" value="2" />
+                            <label class="form-check-label" for="gridCheck2">
+                                <img class="warning-icon pop-warning" src="img/otd.png" data-content="Zagrożenie terminu dostawy"
+                                     data-placement="right" data-toggle="popover" data-html="true"/>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-5">
                     <div class="form-group">
                         <label for="recommendActionTextArea">Zalecenia/Akcje Assel</label>
                         <textarea name="recommendation" class="form-control" id="recommendActionTextArea" rows="3"
@@ -196,7 +215,26 @@
                         ></textarea>
                     </div>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-2">
+                    <div class="form-group">
+                        <label>Zagrożenie</label>
+                        <div class="form-check m-2">
+                            <input class="form-check-input" type="checkbox" id="editGridCheck1" value="1" />
+                            <label class="form-check-label" for="editGridCheck1">
+                                <img class="warning-icon pop-warning" src="img/ctq.png" data-content="Zagrożenie dla jakości"
+                                     data-placement="right" data-toggle="popover" data-html="true"/>
+                            </label>
+                        </div>
+                        <div class="form-check m-2">
+                            <input class="form-check-input" type="checkbox" id="editGridCheck2" value="2" />
+                            <label class="form-check-label" for="editGridCheck2">
+                                <img class="warning-icon pop-warning" src="img/otd.png" data-content="Zagrożenie terminu dostawy"
+                                     data-placement="right" data-toggle="popover" data-html="true"/>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
                     <div class="form-group">
                         <label for="editImageContainer">Zdjęcia</label>
                         <div class="text-center">
@@ -205,7 +243,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-3">
                     <div class="form-group">
                         <label for="editRecommendActionTextArea">Zalecenia/Akcje Assel</label>
                         <textarea name="editRecommendation" class="form-control" id="editRecommendActionTextArea"

@@ -15,6 +15,7 @@ today = yyyy + '-' + mm + '-' + dd;
 console.log(today);
 
 var imagesToDelete = [];
+var attachmentsToDelete = [];
 
 function restoreDefaultLabels() {
     var label = document.querySelector('#image_uploads_label');
@@ -60,6 +61,16 @@ function saveProblem() {
     formData.append('author', 1682);
     formData.append('priority', $('#priorityControlSelect').val());
     formData.append('closed', $('#statusControlSelect').val());
+    var warning1 =0;
+    var warning2 =0;
+    if($('#gridCheck1').is(':checked')) {
+        warning1 = 1;
+    }
+    if($('#gridCheck2').is(':checked')) {
+        warning2 = 2;
+    }
+    var warning = warning1+warning2;
+    formData.append('warning',warning);
     var input = document.querySelector('#image_uploads');
     var curFiles = input.files;
     if (curFiles.length === 0) {
@@ -98,6 +109,9 @@ function saveProblem() {
             $('.pop-button').popover({
                 trigger: "hover"
             });
+            $('.pop-warning').popover({
+                trigger: "hover"
+            });
         },
         error: function() {
             console.log("Błąd zapisu danych");
@@ -111,11 +125,21 @@ function saveProblem() {
 }
 
 $(document).ready(function() {
+    $('.pop-warning').popover({
+        trigger: "hover"
+    });
+
     var url = '/products/problems?reportId=' + $('#reportRev').val();
     $("#resultsBlock").load(url, function() {
         $('.pop-row').popover({
             trigger: "hover"
         });
+        $('.pop-button').popover({
+                    trigger: "hover"
+                });
+                $('.pop-warning').popover({
+                            trigger: "hover"
+                        });
     });
 
     var url = '/report?reportId=' + $('#reportRev').val();
@@ -134,6 +158,23 @@ $(document).ready(function() {
         var updateUrl = $(this).attr('value');
         $('.btnUpdate').attr('value', updateUrl);
         $('#editDescriptionTextArea').val($(this).closest('tr').find('#descriptionTd').text());
+        switch($(this).closest('tr').find('#warningTd').children().attr('id')) {
+                    case 'warning1':
+                        $('#editGridCheck1').attr('checked',true);
+                    break;
+                    case 'warning2':
+                        $('#editGridCheck2').attr('checked',true);
+                    break;
+                    case 'warning3':
+                        $('#editGridCheck1').attr('checked',true);
+                        $('#editGridCheck2').attr('checked',true);
+                    break;
+                    default:
+                        $('#editGridCheck1').attr('checked',false);
+                        $('#editGridCheck2').attr('checked',false);
+                    break;
+                }
+
         if ($(this).closest('tr').find('a').attr('href') == '') {
             $('#editImageImg').attr('src', '/img/no-photo.png');
             $('#editImageA').removeAttr('href');
@@ -169,11 +210,28 @@ $(document).ready(function() {
         $(this).remove();
     });
 
+    $('#summaryBlock').on('click', '.remove-attachment-image', function() {
+            console.log($(this).prev().attr('href'));
+            attachmentsToDelete.push($(this).prev().attr('href'));
+            $(this).prev().remove();
+            $(this).remove();
+        });
+
     function saveSummary() {
         var saveReportUrl = $('#summaryBlock').attr('value');
         var formData = new FormData();
         formData.append('summary', $('#economicalSummaryTextArea').val());
         formData.append('conclusion', $('#summaryTextArea').val());
+        var input = document.querySelector('#economicalSummaryFileInput');
+        var curFiles = input.files;
+        if (curFiles.length === 0) {
+            console.log('No file selected');
+        } else {
+            for (var i = 0; i < curFiles.length; i++) {
+               formData.append('attachment[]', curFiles[i]);
+            }
+        }
+        formData.append('attachmentsToDelete[]', attachmentsToDelete);
 
         $.ajax({
             type: 'POST',
@@ -183,7 +241,7 @@ $(document).ready(function() {
             processData: false,
             contentType: false,
             beforeSend: function() {
-                $('#popup').attr('class', 'active')
+                $('#popup').attr('class', 'active');
             },
             success: function(response) {
                 $('#summaryBlock').empty();
@@ -195,6 +253,7 @@ $(document).ready(function() {
             complete: function() {
                 $('#popup').attr('class', '');
                 restoreDefaultLabels();
+                imagesToDelete = [];
             }
         });
     }
@@ -206,6 +265,11 @@ $(document).ready(function() {
     $('#summaryBlock').on('blur', '#summaryTextArea', function() {
         saveSummary();
     });
+
+    $('#summaryBlock').on('click', '.btnSaveSummaryAttachment', function() {
+        saveSummary();
+    });
+
 
     $('#tasksBlock').on('click', '.btnEditTask', function() {
         $('#editTaskFormBlock').attr('class', 'active')
@@ -261,6 +325,9 @@ $(document).ready(function() {
                 $('.pop-button').popover({
                     trigger: "hover"
                 });
+                $('.pop-warning').popover({
+                    trigger: "hover"
+                });
                 $('.popover').remove();
             },
             error: function() {
@@ -303,6 +370,16 @@ $(document).ready(function() {
         var updateUrl = $(this).attr('value');
         var formData = new FormData();
         formData.append('description', $('#editDescriptionTextArea').val());
+        var warning1 =0;
+            var warning2 =0;
+            if($('#editGridCheck1').is(':checked')) {
+                warning1 = 1;
+            }
+            if($('#editGridCheck2').is(':checked')) {
+                warning2 = 2;
+            }
+            var warning = warning1+warning2;
+            formData.append('warning',warning);
         formData.append('attachmentSrc', '');
         formData.append('recommendation', $('#editRecommendActionTextArea').val());
         formData.append('category', $('#editCategoryControlSelect').val());
@@ -349,6 +426,9 @@ $(document).ready(function() {
                 $('.pop-button').popover({
                     trigger: "hover"
                 });
+                $('.pop-warning').popover({
+                                    trigger: "hover"
+                                });
                 $('.popover').remove();
             },
             error: function() {
@@ -361,6 +441,8 @@ $(document).ready(function() {
                 restoreDefaultLabels();
                 $('#editImageContainer').html("");
                 imagesToDelete = [];
+                $('#editGridCheck1').attr('checked',false);
+                $('#editGridCheck2').attr('checked',false);
             }
         });
     });
@@ -461,6 +543,8 @@ $(document).ready(function() {
         $('#editFormBlock').attr('class', '');
         $('#editImageContainer').html("");
         imagesToDelete = [];
+        $('#editGridCheck1').attr('checked',false);
+        $('#editGridCheck2').attr('checked',false);
     });
 
     $('#btnCancelAddTask').on('click', function cancel() {
