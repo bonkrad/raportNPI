@@ -1,0 +1,234 @@
+
+.container-bg {
+	background-color: silver;
+}
+
+.h-margin {
+	margin-top: 25px;
+	margin-bottom: 25px;
+}
+
+.bot-margin {
+	margin-bottom: 100px;
+}
+
+.glyph-icon {
+	width:15px;
+	height:15px;
+}
+
+.glyph-icon-small {
+	width:12px;
+	height:12px;
+}
+
+.btn-task {
+	padding-left:8px;
+	padding-right:8px;
+	padding-top:3px;
+	padding-bottom:3px;
+}
+
+.thumbnail-img {
+width:100px;
+height:auto;
+}
+
+#editFormBlock {
+    position: fixed; /* Sit on top of the page content */
+    height: 0;
+    opacity: 0;
+    transition: all 1s ease;
+    overflow: hidden;
+    width: 100%; /* Full width (cover the whole page) */
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0,0,0,0.5); /* Black background with opacity */
+    z-index: 2; /* Specify a stack order in case you're using a different order for other elements */
+    cursor: pointer; /* Add a pointer on hover */
+}
+
+#editFormBlock.active {
+   display: block;
+   opacity: 1;
+   height: 100%;
+}
+
+#editFormBlock .container {
+    position: absolute;
+      left: 50%;
+      top: 50%;
+      -webkit-transform: translate(-50%, -50%);
+      transform: translate(-50%, -50%);
+}
+
+#editFormBlock .container form {
+    border-radius:10px;
+    padding: 20px;
+    background-color: #fff;
+}
+
+#addTaskFormBlock {
+    position: fixed; /* Sit on top of the page content */
+        height: 0;
+        opacity: 0;
+        transition: all 0.5s ease-in;
+        overflow: hidden;
+        width: 100%; /* Full width (cover the whole page) */
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0,0,0,0.5); /* Black background with opacity */
+        z-index: 2; /* Specify a stack order in case you're using a different order for other elements */
+        cursor: pointer; /* Add a pointer on hover */
+}
+
+#addTaskFormBlock.active {
+   display: block;
+      opacity: 1;
+      height: 100%;
+}
+
+#addTaskFormBlock .container {
+    position: absolute;
+      left: 50%;
+      top: 50%;
+      -webkit-transform: translate(-50%, -50%);
+      transform: translate(-50%, -50%);
+}
+
+#addTaskFormBlock .container form {
+    border-radius:10px;
+    padding: 20px;
+    background-color: #fff;
+}
+
+#editTaskFormBlock {
+    position: fixed; /* Sit on top of the page content */
+        height: 0;
+        opacity: 0;
+        transition: all 0.5s ease-in;
+        overflow: hidden;
+        width: 100%; /* Full width (cover the whole page) */
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0,0,0,0.5); /* Black background with opacity */
+        z-index: 2; /* Specify a stack order in case you're using a different order for other elements */
+        cursor: pointer; /* Add a pointer on hover */
+}
+
+#editTaskFormBlock.active {
+   display: block;
+      opacity: 1;
+      height: 100%;
+}
+
+#editTaskFormBlock .container {
+    position: absolute;
+      left: 50%;
+      top: 50%;
+      -webkit-transform: translate(-50%, -50%);
+      transform: translate(-50%, -50%);
+}
+
+#editTaskFormBlock .container form {
+    border-radius:10px;
+    padding: 20px;
+    background-color: #fff;
+}
+
+#popup {
+    position: fixed; /* Sit on top of the page content */
+        height: 0;
+        opacity: 0;
+        transition: all 0.25s ease-in;
+        overflow: hidden;
+        width: 100%; /* Full width (cover the whole page) */
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0,0,0,0.5); /* Black background with opacity */
+        z-index: 2; /* Specify a stack order in case you're using a different order for other elements */
+        cursor: pointer; /* Add a pointer on hover */
+}
+
+#popup.active {
+   display: block;
+      opacity: 1;
+      height: 100%;
+}
+
+#popup .container {
+    background-color: #fff;
+    position: absolute;
+      left: 50%;
+      top: 50%;
+      -webkit-transform: translate(-50%, -50%);
+      transform: translate(-50%, -50%);
+}
+
+table {
+width: 100%;
+}
+
+.image .img-thumb {
+    object-fit: cover;
+    overflow: hidden;
+    height: 3vw;
+    width : 5vw;
+    margin: 2px;
+}
+
+.remove-image {
+    height: 1vw;
+    width: 1vw;
+}
+
+#createReportBlock {
+    position: fixed; /* Sit on top of the page content */
+        height: 0;
+        opacity: 0;
+        transition: all 0.25s ease-in;
+        overflow: hidden;
+        width: 100%; /* Full width (cover the whole page) */
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0,0,0,0.5); /* Black background with opacity */
+        z-index: 2; /* Specify a stack order in case you're using a different order for other elements */
+        cursor: pointer; /* Add a pointer on hover */
+}
+
+#createReportBlock.active {
+   display: block;
+      opacity: 1;
+      height: 100%;
+}
+
+#createReportBlock .container {
+    position: absolute;
+      left: 50%;
+      top: 50%;
+      -webkit-transform: translate(-50%, -50%);
+      transform: translate(-50%, -50%);
+      width:auto;
+}
+
+#createReportBlock .container .questionForm {
+    border-radius:10px;
+    padding: 20px;
+    background-color: #fff;
+}
+
+#createReportBlock .container .questionForm div{
+    text-align: center;
+}
+
+

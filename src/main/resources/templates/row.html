@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org" lang="en">
+
+<head>
+</head>
+
+<body>
+<div th:fragment="resultsList">
+    <div class="text-center" id="raport">
+        <h2 class="h-margin">Raport</h2>
+    </div>
+    <div class="text-center">
+        <h4 class="h-margin">Krytyczne - wymagane zamknięcie przed kolejną produkcją</h4>
+    </div>
+    <table class="table table-hover table-bordered table-responsive-xl">
+        <thead>
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col">Priorytet</th>
+            <th scope="col">Kategoria</th>
+            <th scope="col">Opis</th>
+            <th scope="col">Zdjęcia</th>
+            <th scope="col">Zalecenie/ Akcje Assel</th>
+            <th scope="col">Status</th>
+            <th scope="col">Odpowiedź klienta</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="problem,iterationStatus : ${majorProblems}" th:classappend="${problem.closed == false}?table-danger:table-success">
+            <th th:text="${iterationStatus.count}" scope="row" class="pop-row"
+                th:attr="data-content=${problem.timestamp.getTime().toString()}, data-original-title=${problem.author}"
+                data-placement="left"
+                data-toggle="popover" data-html="true">1
+            </th>
+            <td id="priorityTd" th:text="${problem.priority}">Priority</td>
+            <td id="categoryTd" th:text="${problem.category}">Category</td>
+            <td id="descriptionTd" th:text="${problem.description}">Description</td>
+            <td id="imgTd">
+                <div th:each="src : ${problem.imgSrc}" class="image">
+                    <a target="_blank" th:href="${src}">
+                        <img th:unless="${problem.imgSrc}==''" th:src="${src}" class="img-fluid img-thumb"
+                             alt="image"/>
+                    </a>
+                </div>
+            </td>
+            <td id="recommendationTd" th:text="${problem.recommendation}">Recommendations</td>
+            <td id="statusTd" th:text="${problem.getStatus()}">Status</td>
+            <td id="answerTd" th:text="${problem.answer}">Answer</td>
+            <td id="attachmentTd">
+                <div>
+                    <a th:unless="${problem.attachmentSrc}==''" target="_blank" th:href="${problem.attachmentSrc}">
+                        <button class="btn btn-outline-secondary pop-button" type="button" data-content="Załącznik"
+                                data-placement="left" data-toggle="popover" data-html="true">
+                            <img class="glyph-icon" src="img/glyphicons-63-paperclip.png"/>
+                        </button>
+                    </a>
+                </div>
+            </td>
+            <!--<td>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="" id="defaultCheck1"
+                           th:checked="${flag} ? 'checked'"/>
+                </div>
+            </td>-->
+            <td>
+                <form>
+                    <button th:value="@{/update(problemId=${problem.id})}"
+                            class="btn btn-outline-secondary btnEdit pop-button"
+                            type="button" data-content="Edytuj" data-placement="right" data-toggle="popover"
+                            data-html="true">
+                        <img class="glyph-icon" src="img/glyphicons-151-edit.png"/>
+                    </button>
+                </form>
+                <form action="#"
+                      th:action="@{/products(problemId=${problem.id})}"
+                      th:method="post">
+                    <button th:value="@{/products(problemId=${problem.id})}"
+                            class="btn btn-outline-secondary btnDelete pop-button"
+                            type="button" data-content="Usuń" data-placement="right" data-toggle="popover"
+                            data-html="true">
+                        <img class="glyph-icon" src="img/glyphicons-208-remove.png"/>
+                    </button>
+                </form>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <div class="text-center">
+        <h4 class="h-margin">Pozostałe obserwacje</h4>
+    </div>
+    <table class="table table-hover table-bordered table-responsive-xl">
+        <thead>
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col">Priorytet</th>
+            <th scope="col">Kategoria</th>
+            <th scope="col">Opis</th>
+            <th scope="col">Zdjęcia</th>
+            <th scope="col">Zalecenie/ Akcje Assel</th>
+            <th scope="col">Status</th>
+            <th scope="col">Odpowiedź klienta</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="problem,iterationStatus : ${minorProblems}" th:classappend="${problem.closed == false}?table-danger:table-success">
+            <th th:text="${iterationStatus.count}" scope="row" class="pop-row"
+                th:attr="data-content=${problem.timestamp.getTime().toString()}, data-original-title=${problem.author}"
+                data-placement="left"
+                data-toggle="popover" data-html="true">1
+            </th>
+            <td id="priorityTd" th:text="${problem.priority}">Priority</td>
+            <td id="categoryTd" th:text="${problem.category}">Category</td>
+            <td id="descriptionTd" th:text="${problem.description}">Description</td>
+            <td id="imgTd">
+                <div th:each="src : ${problem.imgSrc}" class="image">
+                    <a target="_blank" th:href="${src}">
+                        <img th:unless="${problem.imgSrc}==''" th:src="${src}" class="img-fluid img-thumb"
+                             alt="image"/>
+                    </a>
+                </div>
+            </td>
+            <td id="recommendationTd" th:text="${problem.recommendation}">Recommendations</td>
+            <td id="statusTd" th:text="${problem.getStatus()}">Status</td>
+            <td id="answerTd" th:text="${problem.answer}">Answer</td>
+            <td id="attachmentTd">
+                <div>
+                    <a th:unless="${problem.attachmentSrc}==''" target="_blank" th:href="${problem.attachmentSrc}">
+                        <button class="btn btn-outline-secondary pop-button" type="button" data-content="Załącznik"
+                                data-placement="left" data-toggle="popover" data-html="true">
+                            <img class="glyph-icon" src="img/glyphicons-63-paperclip.png"/>
+                        </button>
+                    </a>
+                </div>
+            </td>
+            <!--<td>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="" id="defaultCheck1"
+                           th:checked="${flag} ? 'checked'"/>
+                </div>
+            </td>-->
+            <td>
+                <form>
+                    <button th:value="@{/update(problemId=${problem.id})}"
+                            class="btn btn-outline-secondary btnEdit pop-button"
+                            type="button" data-content="Edytuj" data-placement="right" data-toggle="popover"
+                            data-html="true">
+                        <img class="glyph-icon" src="img/glyphicons-151-edit.png"/>
+                    </button>
+                </form>
+                <form>
+                    <button th:value="@{/products(problemId=${problem.id})}"
+                            class="btn btn-outline-secondary btnDelete pop-button" type="button" data-content="Usuń"
+                            data-placement="right" data-toggle="popover" data-html="true">
+                        <img class="glyph-icon" src="img/glyphicons-208-remove.png"/>
+                    </button>
+                </form>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+<script>
+</script>
+</body>
+</html>

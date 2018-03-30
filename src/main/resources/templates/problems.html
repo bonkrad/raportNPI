@@ -1,0 +1,471 @@
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-spring4-4.dtd">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:lang="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Raport NPI 2.0</title>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <!--<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+          th:href="@{/webjars/bootstrap/4.0.0/css/bootstrap.min.css}"/>
+    <link rel="stylesheet" href="style.css" th:href="@{css/style.css}"/>
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+            th:src="@{/webjars/jquery/2.1.4/jquery.min.js}"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+            th:src="@{/webjars/popper.js/1.12.9/popper.min.js}"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+            th:href="@{/webjars/bootstrap/4.00/js/bootstrap.min.js}"></script>-->
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="css/style.css"/>
+</head>
+<body>
+<div class="jumbotron text-center">
+    <h1>Raport NPI</h1>
+</div>
+<div class="container bot-margin">
+    <h1 class="h-margin">
+        <p id="id" th:text="${productIdAx + ' ' + productName + ' rev. ' + reportRev}"></p>
+    </h1>
+    <form action="#" th:action="@{/products}" method="get">
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <span class="input-group-text" id="basic-addon1">Produkt</span>
+            </div>
+            <input type="text" class="form-control" placeholder="ID Produktu AX" aria-label="productId"
+                   aria-describedby="basic-addon1" name="id" th:value="${productIdAx}" id="productId"/>
+            <div class="input-group-append">
+                <button class="btn btn-outline-secondary" type="submit">Wybierz</button>
+            </div>
+        </div>
+    </form>
+    <form action="#" th:action="@{/products}" method="get">
+        <input type="hidden" name="productId" th:value="${productIdAx}"/>
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <span class="input-group-text" id="basic-addon1">Raport</span>
+            </div>
+            <select class="form-control" id="revisionControlSelect" name="reportId">
+                <option th:if="${reportRev} == ${report.revision}" th:each="report : ${reports}"
+                        th:value="${report.id}" th:text="${report.revision}" id="reportRev"></option>
+                <option th:unless="${reportRev} == ${report.revision}" th:each="report : ${reports}"
+                        th:value="${report.id}" th:text="${report.revision}"></option>
+            </select>
+            <div class="input-group-append">
+                <button class="btn btn-outline-secondary" type="button" id="viewReportButton">Pokaż</button>
+                <button class="btn btn-outline-secondary" type="submit">Edytuj</button>
+                <button class="btn btn-outline-secondary" type="button" id="createReportButton">Nowy</button>
+            </div>
+        </div>
+    </form>
+    <div class="text-center">
+        <h2 class="h-margin">Edycja raportu</h2>
+    </div>
+    <div class="text-center">
+        <h4>Wstawianie</h4>
+    </div>
+    <div id="formBlock">
+        <form action="#" th:action="@{/products(reportId=${reportId})}" th:object="${problem}"
+              method="post"
+              id="problemForm">
+            <div class="row">
+                <div class="col-xl-6">
+                    <div class="form-group">
+                        <label for="descriptionTextArea">Opis</label>
+                        <textarea name="description" class="form-control" id="descriptionTextArea" rows="3"
+                                  th:field="*{description}"></textarea>
+                    </div>
+                </div>
+                <div class="col-xl-6">
+                    <div class="form-group">
+                        <label for="recommendActionTextArea">Zalecenia/Akcje Assel</label>
+                        <textarea name="recommendation" class="form-control" id="recommendActionTextArea" rows="3"
+                                  th:field="*{recommendation}"></textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-3 col-md-6">
+                    <div class="form-group">
+                        <label for="image_uploads">Zdjęcia</label>
+                        <div class="input-group mb-3">
+                            <div class="custom-file">
+                                <input type="file" class="custom-file-input form-control" id="image_uploads"
+                                       name="image_uploads" accept=".jpg, .jpeg, .png" multiple="multiple"/>
+                                <label class="custom-file-label" for="image_uploads" id="image_uploads_label">Wybierz
+                                    zdjęcie</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <div class="form-group">
+                        <label for="priorityControlSelect">Priorytet</label>
+                        <select name="priority" class="form-control" id="priorityControlSelect" th:field="*{priority}">
+                            <option value="5">5</option>
+                            <option value="4">4</option>
+                            <option value="3">3</option>
+                            <option value="2">2</option>
+                            <option value="1">1</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <div class="form-group">
+                        <label for="categoryControlSelect">Kategoria</label>
+                        <select name="category" class="form-control" id="categoryControlSelect" th:field="*{category}">
+                            <option value="SMT">SMT</option>
+                            <option value="THT">THT</option>
+                            <option value="FA">FA</option>
+                            <option value="TEST">TEST</option>
+                            <option value="QC">QC</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <div class="form-group">
+                        <label for="statusControlSelect">Status</label>
+                        <select name="closed" class="form-control" id="statusControlSelect" th:field="*{closed}">
+                            <option value="false">Otwarte</option>
+                            <option value="true">Zamkniete</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xl-8">
+                    <div class="form-group">
+                        <label for="answerTextArea">Odpowiedź</label>
+                        <textarea name="answer" class="form-control" id="answerTextArea" rows="1"
+                                  th:field="*{answer}"></textarea>
+                    </div>
+                </div>
+                <div class="col-xl-4">
+                    <div class="form-group">
+                        <label for="image_uploads">Załącznik</label>
+                        <div class="input-group mb-3">
+                            <div class="custom-file">
+                                <input type="file" class="custom-file-input form-control" id="attachment_uploads"
+                                       name="attachment_uploads"/>
+                                <label class="custom-file-label" for="attachment_uploads" id="attachment_uploads_label">Wybierz
+                                    załącznik</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm">
+                    <button class="btn btn-outline-secondary" type="button" onclick="saveProblem()">Zapisz wiersz
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div id="resultsBlock">
+
+    </div>
+    <div id="tasksBlock">
+
+    </div>
+    <div id="summaryBlock" th:value="@{/report(reportId=${reportId})}">
+
+    </div>
+    <form th:action="@{/generateExcel(reportId=${reportId})}" method="post">
+        <div class="row h-margin">
+            <div class="col-sm">
+                <button class="btn btn-outline-secondary" th:value="@{/generateExcel(reportId=${reportId})}"
+                        type="submit">Generuj Raport w Excel
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+<div id="editFormBlock">
+    <div class="container">
+
+        <form action="#"
+              method="post"
+              id="editForm">
+            <div class="text-center mb-3">
+                <h4>Edycja</h4>
+            </div>
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="editDescriptionTextArea">Opis</label>
+                        <textarea name="editDescription" class="form-control" id="editDescriptionTextArea" rows="5"
+                        ></textarea>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="editImageContainer">Zdjęcia</label>
+                        <div class="text-center">
+                            <div id="editImageContainer" class="row">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="editRecommendActionTextArea">Zalecenia/Akcje Assel</label>
+                        <textarea name="editRecommendation" class="form-control" id="editRecommendActionTextArea"
+                                  rows="5"
+                        ></textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-3 col-md-6">
+                    <div class="form-group">
+                        <label for="editImage_uploads">Zdjęcia</label>
+                        <div class="input-group mb-3">
+                            <div class="custom-file">
+                                <input type="file" class="custom-file-input form-control" id="editImage_uploads"
+                                       name="editImage_uploads" accept=".jpg, .jpeg, .png" multiple="multiple"/>
+                                <label class="custom-file-label" for="editImage_uploads" id="editImage_uploads_label">Wybierz
+                                    załączniki</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <div class="form-group">
+                        <label for="editPriorityControlSelect">Priorytet</label>
+                        <select name="editPriority" class="form-control" id="editPriorityControlSelect"
+                        >
+                            <option value="5">5</option>
+                            <option value="4">4</option>
+                            <option value="3">3</option>
+                            <option value="2">2</option>
+                            <option value="1">1</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <div class="form-group">
+                        <label for="editCategoryControlSelect">Kategoria</label>
+                        <select name="editCategoryControlSelect" class="form-control" id="editCategoryControlSelect"
+                        >
+                            <option value="SMT">SMT</option>
+                            <option value="THT">THT</option>
+                            <option value="FA">FA</option>
+                            <option value="TEST">TEST</option>
+                            <option value="QC">QC</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <div class="form-group">
+                        <label for="editStatusControlSelect">Status</label>
+                        <select name="editClosed" class="form-control" id="editStatusControlSelect"
+                        >
+                            <option value="false">Otwarte</option>
+                            <option value="true">Zamkniete</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="form-group">
+                        <label for="editAnswerTextArea">Odpowiedź</label>
+                        <textarea name="editAnswerTextArea" class="form-control" id="editAnswerTextArea" rows="1"
+                        ></textarea>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="image_uploads">Załącznik</label>
+                        <div class="input-group mb-3">
+                            <div class="custom-file">
+                                <input type="file" class="custom-file-input form-control" id="editAttachment_uploads"
+                                       name="editAttachment_uploads"/>
+                                <label class="custom-file-label" for="attachment_uploads"
+                                       id="editAttachment_uploads_label">Wybierz załącznik</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm">
+                    <button class="btn btn-outline-secondary btnUpdate"
+                            type="button">Zapisz wiersz
+                    </button>
+                    <button class="btn btn-outline-secondary btnCancel" id="btnCancel"
+                            type="button">Anuluj
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<div id="addTaskFormBlock">
+    <div class="container">
+        <form action="#" method="post"
+              id="addTaskForm" th:action="@{/task(reportId=${reportId})}" th:object="${task}">
+            <div class="text-center mb-3">
+                <h4>Dodanie zadania</h4>
+            </div>
+            <div class="row">
+                <div class="col-xl">
+                    <div class="form-group">
+                        <label for="addTaskDescriptionTextArea">Zadanie</label>
+                        <textarea name="addTaskDescriptionTextArea" class="form-control" id="addTaskDescriptionTextArea"
+                                  rows="3"></textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-3 col-md-6">
+                    <div class="form-group">
+                        <label for="addTaskResponsibleWorkerInput">Odpowiedzialny</label>
+                        <input name="addTaskResponsibleWorkerInput" class="form-control" type="number"
+                               id="addTaskResponsibleWorkerInput" placeholder="Numer Trace"
+                               onkeypress="return event.keyCode != 13;">
+                        </input>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <div class="form-group">
+                        <label for="addTaskStatusControlSelect">Status</label>
+                        <select name="addTaskStatusControlSelect" class="form-control" id="addTaskStatusControlSelect">
+                            <option value="false">Otwarte</option>
+                            <option value="true">Zamkniete</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <div class="form-group">
+                        <label for="addTaskRequiredDateInput">Wymagana data</label>
+                        <input name="addTaskRequiredDateInput" class="form-control" type="date"
+                               id="addTaskRequiredDateInput" placeholder="Numer Trace">
+                        </input>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xl">
+                    <div class="form-group">
+                        <label for="addTaskComment">Komentarz</label>
+                        <textarea name="addTaskComment" class="form-control" id="addTaskComment" rows="2"></textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm">
+                    <button class="btn btn-outline-secondary btnSaveTask"
+                            type="button" th:value="@{/task(reportId=${reportId})}">Zapisz wiersz
+                    </button>
+                    <button class="btn btn-outline-secondary btnCancelAddTask" id="btnCancelAddTask"
+                            type="button">Anuluj
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<div id="editTaskFormBlock">
+    <div class="container">
+        <form action="#" method="post" id="editTaskForm">
+            <div class="text-center mb-3">
+                <h4>Edycja zadania</h4>
+            </div>
+            <div class="row">
+                <div class="col-xl">
+                    <div class="form-group">
+                        <label for="editTaskDescriptionTextArea">Zadanie</label>
+                        <textarea name="editTaskDescriptionTextArea" class="form-control"
+                                  id="editTaskDescriptionTextArea"
+                                  rows="3"></textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-3 col-md-6">
+                    <div class="form-group">
+                        <label for="editTaskResponsibleWorkerInput">Odpowiedzialny</label>
+                        <input name="editTaskResponsibleWorkerInput" class="form-control" type="number"
+                               id="editTaskResponsibleWorkerInput" placeholder="Numer Trace"
+                               onkeypress="return event.keyCode != 13;">
+                        </input>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <div class="form-group">
+                        <label for="editTaskStatusControlSelect">Status</label>
+                        <select name="editTaskStatusControlSelect" class="form-control"
+                                id="editTaskStatusControlSelect">
+                            <option value="false">Otwarte</option>
+                            <option value="true">Zamkniete</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <div class="form-group">
+                        <label for="editTaskRequiredDateInput">Wymagana data</label>
+                        <input name="editTaskRequiredDateInput" class="form-control" type="date"
+                               id="editTaskRequiredDateInput" placeholder="Numer Trace">
+                        </input>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xl">
+                    <div class="form-group">
+                        <label for="editTaskComment">Komentarz</label>
+                        <textarea name="editTaskComment" class="form-control" id="editTaskComment" rows="2"></textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm">
+                    <button class="btn btn-outline-secondary btnUpdateTask"
+                            type="button" th:value="@{/task(reportId=${reportId})}">Zapisz wiersz
+                    </button>
+                    <button class="btn btn-outline-secondary btnCancelEditTask" id="btnCancelEditTask"
+                            type="button">Anuluj
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div id="createReportBlock">
+    <div class="container">
+        <div class="questionForm">
+            <div class="mb-3">
+                <h5>Czy chcesz skopiować poprzedni raport?</h5>
+            </div>
+            <div>
+                <button class="btn btn-outline-secondary btnCreateReportButtonYes"
+                        type="button">Tak
+                </button>
+                <button class="btn btn-outline-secondary btnCreateReportButtonNo"
+                        type="button">Nie
+                </button>
+                <button class="btn btn-outline-secondary btnCreateReportButtonCancel"
+                        type="button">Anuluj
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="popup">
+    <div class="container">
+        <h1>Wczytywanie....</h1>
+    </div>
+</div>
+
+</body>
+<!--<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>-->
+<script src="http://code.jquery.com/jquery-3.3.1.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+<script src="js/script.js"></script>
+<script src="js/create-report.js"></script>
+<script src="js/files.js"></script>
+
+</html>
+

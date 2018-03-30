@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+</head>
+<body>
+<div th:fragment="tasksList">
+    <div class="row" id="tasks">
+        <div class="col-sm">
+            <div class="form-group">
+                <div class="text-center">
+                    <h5 class="h-margin">Zadania</h5>
+                </div>
+                <table class="table table-sm table-striped table-bordered table-responsive-xl">
+                    <thead >
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Zadanie</th>
+                        <th scope="col">Odpowiedzialny</th>
+                        <th scope="col">Status</th>
+                        <th scope="col">Komentarz</th>
+                        <th scope="col">Wymagana data</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="task, iterationStatus : ${tasks}" th:classappend="${task.closed == false}?table-danger:table-success">
+                        <th th:text="${iterationStatus.count}" scope="row">1</th>
+                        <td id="taskDescriptionTd" th:text="${task.description}"></td>
+                        <td id="taskResponsibleWorkerTd" th:text="${task.responsibleWorker}"></td>
+                        <td id="taskStatusTd" th:text="${task.getStatus()}"></td>
+                        <td id="taskCommentTd" th:text="${task.comment}"></td>
+                        <td id="taskRequiredDateTd" th:text="${task.getDate()}">2018-02-28</td>
+                        <td>
+                            <form>
+                                <button th:value="@{/updateTask(taskId=${task.id})}" class="btn btn-outline-secondary btnEditTask btn-task pop-button" type="button" data-content="Edytuj zadanie" data-placement="right" data-toggle="popover" data-html="true">
+                                    <img class="glyph-icon-small" src="img/glyphicons-151-edit.png"/>
+                                </button>
+                            </form>
+                            <form>
+                                <button th:value="@{/tasks(taskId=${task.id})}" class="btn btn-outline-secondary btnDeleteTask btn-task pop-button" type="button" data-content="Usuń zadanie" data-placement="right" data-toggle="popover" data-html="true">
+                                    <img class="glyph-icon-small" src="img/glyphicons-208-remove.png"/>
+                                </button>
+                            </form>
+                            <form method="post" th:action="@{/taskReminder(taskId=${task.id})}">
+                                <button th:value="@{/taskReminder(taskId=${task.id})}" class="btn btn-outline-secondary btnSendReminder btn-task pop-button" type="button" data-content="Wyślij przypomnienie" data-placement="right" data-toggle="popover" data-html="true">
+                                    <img class="glyph-icon-small" src="img/glyphicons-124-message-out.png"/>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">
+                            <button class="btn btn-outline-secondary btnAddTask" type="button">
+                                <img class="glyph-icon-small" src="img/glyphicons-433-plus.png"/>
+                            </button>
+                        </th>
+                        <th colspan="6">
+                            Dodaj zadanie
+                        </th>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

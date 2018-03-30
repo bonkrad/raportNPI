@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:lang="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Raport NPI 2.0</title>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <!--<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+          th:href="@{/webjars/bootstrap/4.0.0/css/bootstrap.min.css}"/>
+    <link rel="stylesheet" href="style.css" th:href="@{css/style.css}"/>
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+            th:src="@{/webjars/jquery/2.1.4/jquery.min.js}"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+            th:src="@{/webjars/popper.js/1.12.9/popper.min.js}"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+            th:href="@{/webjars/bootstrap/4.00/js/bootstrap.min.js}"></script>-->
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="css/style.css"/>
+</head>
+<body>
+<div class="jumbotron text-center">
+    <h1>Raport NPI</h1>
+</div>
+<div class="container bot-margin">
+    <h1 class="h-margin">
+        <p id="id" th:text="${productIdAx + ' ' + productName}"></p>
+    </h1>
+    <h4 th:if="${alert!=null}">Wybierz poprawny raport lub utwórz nowy</h4>
+    <form action="#" th:action="@{/products}" method="get">
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <span class="input-group-text" id="basic-addon1">Produkt</span>
+            </div>
+            <input type="text" class="form-control" placeholder="ID Produktu AX" aria-label="productId"
+                   aria-describedby="basic-addon1" name="id" th:value="${productIdAx}" id="productId"/>
+            <div class="input-group-append">
+                <button class="btn btn-outline-secondary" type="submit">Wybierz</button>
+            </div>
+        </div>
+    </form>
+    <form action="#" th:action="@{/products}" method="get">
+        <input type="hidden" name="productId" th:value="${productIdAx}"/>
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <span class="input-group-text" id="basic-addon1">Raport</span>
+            </div>
+            <select class="form-control" id="revisionControlSelect" name="reportId">
+                <option th:each="report : ${reports}" th:value="${report.id}" th:text="${report.revision}"></option>
+                <option style="display:none" value="0">---Brak raportów---</option>
+            </select>
+            <div class="input-group-append">
+                <button class="btn btn-outline-secondary" type="button" id="viewReportButton">Pokaż</button>
+                <button class="btn btn-outline-secondary" type="submit">Edytuj</button>
+                <button class="btn btn-outline-secondary" type="button" id="createReportButton">Nowy</button>
+            </div>
+        </div>
+    </form>
+</div>
+<div id="createReportBlock">
+    <div class="container">
+        <div class="questionForm">
+            <div class="mb-3">
+                <h5>Czy chcesz skopiować poprzedni raport?</h5>
+            </div>
+            <div>
+                <button class="btn btn-outline-secondary btnCreateReportButtonYes"
+                        type="button">Tak
+                </button>
+                <button class="btn btn-outline-secondary btnCreateReportButtonNo"
+                        type="button">Nie
+                </button>
+                <button class="btn btn-outline-secondary btnCreateReportButtonCancel"
+                        type="button">Anuluj
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+<script src="http://code.jquery.com/jquery-3.3.1.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+<script src="js/create-report.js"></script>
+</html>
