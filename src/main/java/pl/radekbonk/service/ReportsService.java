@@ -114,7 +114,7 @@ public class ReportsService {
 					attachmentSources.add("/disk/" + productId + "/" + uuid + attachment.getOriginalFilename().replace(" ", ""));
 
 				} catch (Exception e) {
-					System.out.println(e);
+					e.printStackTrace();
 				}
 				reportEntity.setAttachmentSrc(attachmentSources);
 			}
