@@ -19,6 +19,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.math.BigDecimal;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -39,6 +40,9 @@ public class ReportsService {
 
 	@Autowired
 	private HttpServletRequest request;
+
+	private List<String> srcFiles = new ArrayList<>();
+	private int i;
 
 	public Iterable<ReportEntity> getAllReports() {
 		return reportRepository.findAll();
@@ -65,8 +69,8 @@ public class ReportsService {
 	}
 
 	public void save(ReportEntity reportEntity, MultipartFile[] attachment, String[] attachmentsToDelete) {
-		reportEntity = removeAttachement(reportEntity,attachmentsToDelete);
-		reportEntity = reportWithAttachment(reportEntity,attachment);
+		reportEntity = removeAttachement(reportEntity, attachmentsToDelete);
+		reportEntity = reportWithAttachment(reportEntity, attachment);
 		reportRepository.save(reportEntity);
 	}
 
@@ -98,7 +102,7 @@ public class ReportsService {
 	public ReportEntity reportWithAttachment(ReportEntity reportEntity, MultipartFile[] attachments) {
 		long productId = reportEntity.getProduct().getId();
 		List<String> attachmentSources = reportEntity.getAttachmentSrc();
-		if(attachments.length > 0) {
+		if (attachments.length > 0) {
 			for (MultipartFile attachment : attachments) {
 				try {
 					String realPathToUploads = Main.getUploadPath() + productId + "/";
@@ -140,19 +144,45 @@ public class ReportsService {
 		}
 	}
 
+	protected void addImageInCell(Sheet sheet, URL url, Drawing<?> drawing, int colNumber, int rowNumber) {
+		try {
+			BufferedImage imageIO = ImageIO.read(url);
+			int height = imageIO.getHeight();
+			int width = imageIO.getWidth();
+
+			new AddDimensionedImage().addImageToSheet(colNumber, rowNumber, sheet, drawing, url, 7, 5,
+					AddDimensionedImage.OVERLAY_ROW_AND_COLUMN);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	protected void addImageInCell(Sheet sheet, URL url, Drawing<?> drawing, int colNumber, int rowNumber, int height, int width) {
+		try {
+			BufferedImage imageIO = ImageIO.read(url);
+
+			new AddDimensionedImage().addImageToSheet(colNumber, rowNumber, sheet, drawing, url, width, height,
+					AddDimensionedImage.OVERLAY_ROW_AND_COLUMN);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+	}
+
 
 	public String generateExcel(long reportId) throws IOException {
+		i = 0;
+		srcFiles.clear();
 		long productId = findOne(reportId).getProduct().getId();
 		String realPathToUploads = Main.getUploadPath() + productId + "/";
 		if (!new File(realPathToUploads).exists()) {
 			new File(realPathToUploads).mkdir();
 		}
-		List<String> srcFiles = new ArrayList<>();
+
 		FileOutputStream fos = new FileOutputStream(realPathToUploads + getReportNameZip(reportId));
 		ZipOutputStream zipOut = new ZipOutputStream(fos);
 		ReportEntity report = findOne(reportId);
-		//long productId = report.getProduct().getId();
-		//BigDecimal reportRev = report.getRevision();
+
 		String productName = productsService.getProductById(productId).getName();
 
 		String fileName = getReportName(reportId);
@@ -178,13 +208,16 @@ public class ReportsService {
 		headerFont.setFontHeightInPoints((short) 18);
 		headerStyle.setFont(headerFont);
 
-		Row row = sheet.createRow((short) 3);
+		int rowNum = 3;
+
+		Row row = sheet.createRow((short) rowNum); //3
 
 		Cell cell = row.createCell(1);
 		cell.setCellValue("Raport NPI");
 		cell.setCellStyle(headerStyle);
 
-		row = sheet.createRow((short) 8);
+		rowNum += 5; //8
+		row = sheet.createRow((short) rowNum); //8
 
 		cell = row.createCell(1);
 		cell.setCellValue("Nazwa modelu");
@@ -197,7 +230,8 @@ public class ReportsService {
 		sheet.addMergedRegion(cellRangeAddress);
 		setBordersMedium(cellRangeAddress, sheet);
 
-		row = sheet.createRow((short) 10);
+		rowNum += 2; //10
+		row = sheet.createRow((short) rowNum);
 
 		cell = row.createCell(1);
 		cell.setCellValue("Inżynier procesu");
@@ -210,7 +244,8 @@ public class ReportsService {
 		sheet.addMergedRegion(cellRangeAddress);
 		setBordersMedium(cellRangeAddress, sheet);
 
-		row = sheet.createRow((short) 12);
+		rowNum += 2; //12
+		row = sheet.createRow((short) rowNum);
 
 		cell = row.createCell(1);
 		cell.setCellValue("Inżynier produktu");
@@ -223,7 +258,8 @@ public class ReportsService {
 		sheet.addMergedRegion(cellRangeAddress);
 		setBordersMedium(cellRangeAddress, sheet);
 
-		row = sheet.createRow((short) 14);
+		rowNum += 2; //14
+		row = sheet.createRow((short) rowNum);
 
 		cell = row.createCell(1);
 		cell.setCellValue("Inżynier jakości");
@@ -236,7 +272,8 @@ public class ReportsService {
 		sheet.addMergedRegion(cellRangeAddress);
 		setBordersMedium(cellRangeAddress, sheet);
 
-		row = sheet.createRow((short) 17);
+		rowNum += 3; //17
+		row = sheet.createRow((short) rowNum);
 		cell = row.createCell(1);
 		cell.setCellValue("Historia rewizji");
 		cell.setCellStyle(boldText);
@@ -250,7 +287,26 @@ public class ReportsService {
 		borderThin.setBorderLeft(BorderStyle.THIN);
 		borderThin.setBorderRight(BorderStyle.THIN);
 
-		row = sheet.createRow((short) 18);
+		CellStyle borderThinRed = workbook.createCellStyle();
+		borderThinRed.setBorderBottom(BorderStyle.THIN);
+		borderThinRed.setBorderTop(BorderStyle.THIN);
+		borderThinRed.setBorderLeft(BorderStyle.THIN);
+		borderThinRed.setBorderRight(BorderStyle.THIN);
+		Font font = workbook.createFont();
+		font.setColor(Font.COLOR_RED);
+		borderThinRed.setFont(font);
+		borderThinRed.setWrapText(true);
+
+
+		CellStyle wrapText = workbook.createCellStyle();
+		wrapText.setBorderRight(BorderStyle.THIN);
+		wrapText.setBorderLeft(BorderStyle.THIN);
+		wrapText.setBorderTop(BorderStyle.THIN);
+		wrapText.setBorderBottom(BorderStyle.THIN);
+		wrapText.setWrapText(true);
+
+		rowNum += 1; //19
+		row = sheet.createRow((short) rowNum);
 		cell = row.createCell(1);
 		cell.setCellValue("Rewizja");
 		cell.setCellStyle(borderThin);
@@ -263,7 +319,8 @@ public class ReportsService {
 		sheet.addMergedRegion(cellRangeAddress);
 		setBorderThin(cellRangeAddress, sheet);
 
-		short rowNumRevs = 19;
+
+		short rowNumRevs = (short) (rowNum + 1);
 		Iterable<ReportEntity> reports = findByProductIdOrderByRevisionAsc(productId);
 		for (ReportEntity reportEntity : reports) {
 			row = sheet.createRow(rowNumRevs);
@@ -283,248 +340,82 @@ public class ReportsService {
 			rowNumRevs++;
 		}
 
-		row = sheet.createRow((short) 33);
+		rowNum += 14; //33
+		row = sheet.createRow((short) rowNum);
 		cell = row.createCell(0);
 		cell.setCellValue("1.Wstęp");
 		cell.setCellStyle(boldBigText);
 
-		row = sheet.createRow((short) 34);
+		rowNum += 1; //34
+		row = sheet.createRow((short) rowNum);
 		cell = row.createCell(0);
 		cell.setCellValue("Krótki opis produktu oraz przebiegu wdrożenia – wyszczególnienie procesów, jakie miały miejsce, każdy proces po 2-3 zdania opisu");
 
-		row = sheet.createRow((short) 36);
+		rowNum += 2; //36
+		row = sheet.createRow((short) rowNum);
 		cell = row.createCell(0);
 		cell.setCellValue("2.Znalezione problemy, wątpliwości");
 		cell.setCellStyle(boldBigText);
 
-		row = sheet.createRow((short) 38);
+		rowNum += 2; //38
+		row = sheet.createRow((short) rowNum);
 		cell = row.createCell(0);
 		cell.setCellValue("Krytyczne - wymagane zamknięcie przed kolejną produkcją");
 		cell.setCellStyle(boldText);
-		cellRangeAddress = new CellRangeAddress(38, 38, 0, 7);
+		cellRangeAddress = new CellRangeAddress(row.getRowNum(), row.getRowNum(), 0, 8);
 		sheet.addMergedRegion(cellRangeAddress);
 		setBorderThin(cellRangeAddress, sheet);
-
-		row = sheet.createRow((short) 39);
-		cell = row.createCell(0);
-		cell.setCellValue("Lp.");
-		cell.setCellStyle(borderThin);
-		cell = row.createCell(1);
-		cell.setCellValue("Priorytet");
-		cell.setCellStyle(borderThin);
-		cell = row.createCell(2);
-		cell.setCellValue("Opis");
-		cell.setCellStyle(borderThin);
-		sheet.setColumnWidth(cell.getColumnIndex(), (int) Math.ceil((sheet.getColumnWidth(cell.getColumnIndex())) * 3.5));
-		cell = row.createCell(3);
-		cell.setCellValue("Zdjęcie");
-		cellRangeAddress = new CellRangeAddress(39, 39, 3, 4);
-		sheet.addMergedRegion(cellRangeAddress);
-		setBorderThin(cellRangeAddress, sheet);
-		cell = row.createCell(5);
-		cell.setCellValue("Zalecenia/Akcje Assel");
-		cell.setCellStyle(borderThin);
-		sheet.setColumnWidth(cell.getColumnIndex(), (int) Math.ceil((sheet.getColumnWidth(cell.getColumnIndex())) * 3.5));
-		cell = row.createCell(6);
-		cell.setCellValue("Status");
-		cell.setCellStyle(borderThin);
-		cell = row.createCell(7);
-		cell.setCellValue("Odpowiedź klienta");
-		cell.setCellStyle(borderThin);
-		sheet.setColumnWidth(cell.getColumnIndex(), (int) Math.ceil((sheet.getColumnWidth(cell.getColumnIndex())) * 2.5));
-
-		CellStyle wrapText = workbook.createCellStyle();
-		wrapText.setBorderRight(BorderStyle.THIN);
-		wrapText.setBorderLeft(BorderStyle.THIN);
-		wrapText.setBorderTop(BorderStyle.THIN);
-		wrapText.setBorderBottom(BorderStyle.THIN);
-		wrapText.setWrapText(true);
 
 		Iterable<ProblemEntity> majorProblems = problemsService.findMajorByReportId(reportId);
-		int rowNum = 40;
-		int i = 0;
-		for (ProblemEntity problem : majorProblems) {
-			row = sheet.createRow((short) rowNum++);
-			cell = row.createCell(0);
-			cell.setCellValue(rowNum - 40);
-			cell.setCellStyle(borderThin);
-			cell = row.createCell(1);
-			cell.setCellValue(problem.getPriority());
-			cell.setCellStyle(borderThin);
-			cell = row.createCell(2);
-			cell.setCellValue(problem.getDescription());
-			cell.setCellStyle(wrapText);
-			cell = row.createCell(3);
-			//TODO
-			if (!problem.getImgSrc().isEmpty()) {
-				i++;
-				cell.setCellValue("fig" + i);
-				String pathToImages = Main.getUploadPath().replace("/disk/", "/");
-				Sheet imageSheet = workbook.createSheet("fig" + i);
-				int totalHeight = 0;
-				for (String imgSrc : problem.getImgSrc()) {
-					try (InputStream is = new FileInputStream(pathToImages + imgSrc)) {
-						BufferedImage bufferedImage = ImageIO.read(new FileInputStream(pathToImages + imgSrc));
-						byte[] bytes = IOUtils.toByteArray(is);
-						int pictureIdx = workbook.addPicture(bytes, Workbook.PICTURE_TYPE_JPEG);
-						Drawing drawing = imageSheet.createDrawingPatriarch();
-						CreationHelper helper = workbook.getCreationHelper();
-						ClientAnchor anchor = helper.createClientAnchor();
-						anchor.setCol1(0);
-						int currentRow = (int) Math.ceil(totalHeight/20);
-						anchor.setRow1(currentRow);
-						Picture pict = drawing.createPicture(anchor, pictureIdx);
-						totalHeight=totalHeight+bufferedImage.getHeight();
-						pict.resize();
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
-				}
-				CreationHelper helper = workbook.getCreationHelper();
-				Hyperlink link = helper.createHyperlink(HyperlinkType.DOCUMENT);
-				link.setAddress("'fig" + i + "'!A1");
-				cell.setHyperlink(link);
-			}
-			cellRangeAddress = new CellRangeAddress(rowNum - 1, rowNum - 1, 3, 4);
-			sheet.addMergedRegion(cellRangeAddress);
-			setBorderThin(cellRangeAddress, sheet);
-			cell = row.createCell(5);
-			cell.setCellValue(problem.getRecommendation());
-			cell.setCellStyle(wrapText);
-			cell = row.createCell(6);
-			cell.setCellValue(problem.getStatus());
-			cell.setCellStyle(wrapText);
-			cell = row.createCell(7);
-			cell.setCellValue(problem.getAnswer());
-			cell.setCellStyle(wrapText);
-			if (problem.getAttachmentSrc() != ("")) {
-				cell = row.createCell(8);
-				cell.setCellValue("att.");
-				cell.setCellStyle(wrapText);
-				CreationHelper helper = workbook.getCreationHelper();
-				Hyperlink link = helper.createHyperlink(HyperlinkType.FILE);
-				link.setAddress(problem.getAttachmentSrc().replace("/disk/" + productId + "/", ""));
-				cell.setHyperlink(link);
-				srcFiles.add(Main.getUploadPath().replace("disk/", "") + problem.getAttachmentSrc());
-			}
-		}
+		rowNum = createProblemsTable(majorProblems, workbook, sheet, rowNum, borderThin, productId, borderThinRed, wrapText);
 
 		rowNum++;
-		row = sheet.createRow((short) rowNum++);
+		row = sheet.createRow((short) rowNum);
 		cell = row.createCell(0);
 		cell.setCellValue("Pozostałe");
 		cell.setCellStyle(boldText);
-		cellRangeAddress = new CellRangeAddress(rowNum - 1, rowNum - 1, 0, 7);
+		cellRangeAddress = new CellRangeAddress(row.getRowNum(), row.getRowNum(), 0, 8);
 		sheet.addMergedRegion(cellRangeAddress);
 		setBorderThin(cellRangeAddress, sheet);
-
-		row = sheet.createRow((short) rowNum++);
-		cell = row.createCell(0);
-		cell.setCellValue("Lp.");
-		cell.setCellStyle(borderThin);
-		cell = row.createCell(1);
-		cell.setCellValue("Priorytet");
-		cell.setCellStyle(borderThin);
-		cell = row.createCell(2);
-		cell.setCellValue("Opis");
-		cell.setCellStyle(borderThin);
-		cell = row.createCell(3);
-		cell.setCellValue("Zdjęcie");
-		cellRangeAddress = new CellRangeAddress(rowNum - 1, rowNum - 1, 3, 4);
-		sheet.addMergedRegion(cellRangeAddress);
-		setBorderThin(cellRangeAddress, sheet);
-		cell = row.createCell(5);
-		cell.setCellValue("Zalecenia/Akcje Assel");
-		cell.setCellStyle(borderThin);
-		cell = row.createCell(6);
-		cell.setCellValue("Status");
-		cell.setCellStyle(borderThin);
-		cell = row.createCell(7);
-		cell.setCellValue("Odpowiedź klienta");
-		cell.setCellStyle(borderThin);
 
 		Iterable<ProblemEntity> minorProblems = problemsService.findMinorByReportId(reportId);
-		for (ProblemEntity problem : minorProblems) {
-			row = sheet.createRow((short) rowNum++);
-			cell = row.createCell(0);
-			cell.setCellValue(rowNum - 40);
-			cell.setCellStyle(borderThin);
-			cell = row.createCell(1);
-			cell.setCellValue(problem.getPriority());
-			cell.setCellStyle(borderThin);
-			cell = row.createCell(2);
-			cell.setCellValue(problem.getDescription());
-			cell.setCellStyle(wrapText);
-			cell = row.createCell(3);
-			//TODO
-			if (!problem.getImgSrc().isEmpty()) {
-				i++;
-				cell.setCellValue("fig" + i);
-				String pathToImages = Main.getUploadPath().replace("/disk/", "/");
-				Sheet imageSheet = workbook.createSheet("fig" + i);
-				int totalHeight = 0;
-				for (String imgSrc : problem.getImgSrc()) {
-					try (InputStream is = new FileInputStream(pathToImages + imgSrc)) {
-						BufferedImage bufferedImage = ImageIO.read(new FileInputStream(pathToImages + imgSrc));
-						byte[] bytes = IOUtils.toByteArray(is);
-						int pictureIdx = workbook.addPicture(bytes, Workbook.PICTURE_TYPE_JPEG);
-						Drawing drawing = imageSheet.createDrawingPatriarch();
-						CreationHelper helper = workbook.getCreationHelper();
-						ClientAnchor anchor = helper.createClientAnchor();
-						anchor.setCol1(0);
-						int currentRow = (int) Math.ceil(totalHeight/20);
-						anchor.setRow1(currentRow);
-						Picture pict = drawing.createPicture(anchor, pictureIdx);
-						totalHeight=totalHeight+bufferedImage.getHeight();
-						pict.resize();
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
-				}
-				CreationHelper helper = workbook.getCreationHelper();
-				Hyperlink link = helper.createHyperlink(HyperlinkType.DOCUMENT);
-				link.setAddress("'fig" + i + "'!A1");
-				cell.setHyperlink(link);
-			}
-			cellRangeAddress = new CellRangeAddress(rowNum - 1, rowNum - 1, 3, 4);
-			sheet.addMergedRegion(cellRangeAddress);
-			setBorderThin(cellRangeAddress, sheet);
-			cell = row.createCell(5);
-			cell.setCellValue(problem.getRecommendation());
-			cell.setCellStyle(wrapText);
-			cell = row.createCell(6);
-			cell.setCellValue(problem.getStatus());
-			cell.setCellStyle(wrapText);
-			cell = row.createCell(7);
-			cell.setCellValue(problem.getAnswer());
-			cell.setCellStyle(wrapText);
-			if (problem.getAttachmentSrc() != ("")) {
-				cell = row.createCell(8);
-				cell.setCellValue("att.");
-				cell.setCellStyle(wrapText);
-				CreationHelper helper = workbook.getCreationHelper();
-				Hyperlink link = helper.createHyperlink(HyperlinkType.FILE);
-				link.setAddress(problem.getAttachmentSrc().replace("/disk/" + productId + "/", ""));
-				cell.setHyperlink(link);
-				System.out.println(problem.getAttachmentSrc());
-				srcFiles.add(Main.getUploadPath().replace("disk/", "") + problem.getAttachmentSrc());
-			}
-		}
+		rowNum = createProblemsTable(minorProblems, workbook, sheet, rowNum, borderThin, productId, borderThinRed, wrapText);
 
-		rowNum++;
-		row = sheet.createRow((short) rowNum++);
+		rowNum += 2;
+		row = sheet.createRow((short) rowNum);
 		cell = row.createCell(0);
 		cell.setCellValue("3.Podsumowanie ekonomiczne");
 		cell.setCellStyle(boldBigText);
-		row = sheet.createRow((short) rowNum++);
-		row.createCell(0).setCellValue(report.getSummary());
-
 		rowNum++;
-		row = sheet.createRow((short) rowNum++);
+		row = sheet.createRow((short) rowNum);
+		row.createCell(0).setCellValue(report.getSummary());
+		rowNum += 2;
+		row = sheet.createRow((short) rowNum);
+		row.createCell(0).setCellValue("Załączniki");
+		row.getCell(0).setCellStyle(boldText);
+		rowNum++;
+		int k = 1;
+		//TODO 1
+		for (String reportAttachmentSrc : report.getAttachmentSrc()) {
+			row = sheet.createRow((short) rowNum);
+			cell = row.createCell(0);
+			cell.setCellValue("Attachment " + k);
+			CreationHelper helper = workbook.getCreationHelper();
+			Hyperlink link = helper.createHyperlink(HyperlinkType.FILE);
+			link.setAddress(reportAttachmentSrc.replace("/disk/" + productId + "/", ""));
+			cell.setHyperlink(link);
+			k++;
+			rowNum++;
+		}
+
+
+		rowNum += 2;
+		row = sheet.createRow((short) rowNum);
 		cell = row.createCell(0);
 		cell.setCellValue("4.Wnioski");
 		cell.setCellStyle(boldBigText);
-		row = sheet.createRow((short) rowNum++);
+		rowNum++;
+		row = sheet.createRow((short) rowNum);
 		row.createCell(0).setCellValue(report.getConclusion());
 
 		try (FileOutputStream outputStream = new FileOutputStream(realPathToUploads + fileName)) {
@@ -534,6 +425,10 @@ public class ReportsService {
 			e.printStackTrace();
 		}
 		System.out.println(realPathToUploads + fileName);
+		for (String reportAttachmentSrc : report.getAttachmentSrc()) {
+			srcFiles.add(Main.getUploadPath().replace("disk/", "") + reportAttachmentSrc);
+		}
+
 		srcFiles.add(realPathToUploads + fileName);
 		for (String srcFile : srcFiles) {
 			File fileToZip = new File(srcFile);
@@ -552,8 +447,136 @@ public class ReportsService {
 		fos.close();
 
 		return realPathToUploads + getReportNameZip(reportId);
-		//return "http://83.13.11.217:8080/disk/"+productId+"/" + productId + "-raport.zip";
 	}
+
+	private int createProblemsTable(Iterable<ProblemEntity> problems, Workbook workbook, Sheet sheet, int rowNum, CellStyle borderThin, long productId, CellStyle borderThinRed, CellStyle wrapText) {
+
+		rowNum++;
+		Row row = sheet.createRow((short) rowNum);
+		Cell cell = row.createCell(0);
+		cell.setCellValue("Lp.");
+		cell.setCellStyle(borderThin);
+		sheet.setColumnWidth(cell.getColumnIndex(), (int) Math.ceil((sheet.getColumnWidth(15)) * 0.6));
+		cell = row.createCell(1);
+		cell.setCellValue("Priorytet");
+		cell.setCellStyle(borderThin);
+		cell = row.createCell(2);
+		cell.setCellValue("Opis");
+		cell.setCellStyle(borderThin);
+		sheet.setColumnWidth(cell.getColumnIndex(), (int) Math.ceil((sheet.getColumnWidth(15)) * 3.1));
+		cell = row.createCell(3);
+		cell.setCellValue("Zagrożenie");
+		cell.setCellStyle(borderThin);
+		cell = row.createCell(4);
+		cell.setCellValue("Zdjęcie");
+		CellRangeAddress cellRangeAddress = new CellRangeAddress(row.getRowNum(), row.getRowNum(), 4, 5);
+		sheet.addMergedRegion(cellRangeAddress);
+		setBorderThin(cellRangeAddress, sheet);
+		cell = row.createCell(6);
+		cell.setCellValue("Zalecenia/Akcje Assel");
+		cell.setCellStyle(borderThin);
+		sheet.setColumnWidth(cell.getColumnIndex(), (int) Math.ceil((sheet.getColumnWidth(15)) * 3.1));
+		cell = row.createCell(7);
+		cell.setCellValue("Status");
+		cell.setCellStyle(borderThin);
+		cell = row.createCell(8);
+		cell.setCellValue("Odpowiedź klienta");
+		cell.setCellStyle(borderThin);
+		sheet.setColumnWidth(cell.getColumnIndex(), (int) Math.ceil((sheet.getColumnWidth(15)) * 2.2));
+
+		rowNum++;
+		//int i = 0;
+		int j = 1;
+		for (ProblemEntity problem : problems) {
+			row = sheet.createRow((short) rowNum++);
+			cell = row.createCell(0);
+			cell.setCellValue(j++);
+			cell.setCellStyle(borderThin);
+			cell = row.createCell(1);
+			cell.setCellValue(problem.getPriority());
+			cell.setCellStyle(borderThin);
+			cell = row.createCell(2);
+			cell.setCellValue(problem.getDescription());
+			cell.setCellStyle(wrapText);
+			cell = row.createCell(3);
+			cell.setCellValue("");
+			int warning = problem.getWarning();
+			if (warning != 0) {
+				ClientAnchor anchorImg = cell.getSheet().getWorkbook().getCreationHelper().createClientAnchor();
+				anchorImg.setCol1(cell.getColumnIndex());
+				anchorImg.setRow1(cell.getRowIndex());
+
+				switch (warning) {
+					case 1:
+						cell.setCellValue("CTQ");
+						break;
+					case 2:
+						cell.setCellValue("OTD");
+						break;
+					case 3:
+						cell.setCellValue("CTQ \nOTD");
+						break;
+				}
+			}
+			cell.setCellStyle(borderThinRed);
+
+			cell = row.createCell(4);
+			//TODO
+			if (!problem.getImgSrc().isEmpty()) {
+				i++;
+				cell.setCellValue("fig" + i);
+				String pathToImages = Main.getUploadPath().replace("/disk/", "/");
+				Sheet imageSheet = workbook.createSheet("fig" + i);
+				int totalHeight = 0;
+				for (String imgSrc : problem.getImgSrc()) {
+					try (InputStream is = new FileInputStream(pathToImages + imgSrc)) {
+						BufferedImage bufferedImage = ImageIO.read(new FileInputStream(pathToImages + imgSrc));
+						byte[] bytes = IOUtils.toByteArray(is);
+						int pictureIdx = workbook.addPicture(bytes, Workbook.PICTURE_TYPE_JPEG);
+						Drawing drawing = imageSheet.createDrawingPatriarch();
+						CreationHelper helper = workbook.getCreationHelper();
+						ClientAnchor anchor = helper.createClientAnchor();
+						anchor.setCol1(0);
+						int currentRow = (int) Math.ceil(totalHeight / 20);
+						anchor.setRow1(currentRow);
+						Picture pict = drawing.createPicture(anchor, pictureIdx);
+						totalHeight = totalHeight + bufferedImage.getHeight();
+						pict.resize();
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				}
+				CreationHelper helper = workbook.getCreationHelper();
+				Hyperlink link = helper.createHyperlink(HyperlinkType.DOCUMENT);
+				link.setAddress("'fig" + i + "'!A1");
+				cell.setHyperlink(link);
+			}
+			cellRangeAddress = new CellRangeAddress(row.getRowNum(), row.getRowNum(), 4, 5);
+			sheet.addMergedRegion(cellRangeAddress);
+			setBorderThin(cellRangeAddress, sheet);
+			cell = row.createCell(6);
+			cell.setCellValue(problem.getRecommendation());
+			cell.setCellStyle(wrapText);
+			cell = row.createCell(7);
+			cell.setCellValue(problem.getStatus());
+			cell.setCellStyle(wrapText);
+			cell = row.createCell(8);
+			cell.setCellValue(problem.getAnswer());
+			cell.setCellStyle(wrapText);
+			if (problem.getAttachmentSrc() != ("")) {
+				cell = row.createCell(9);
+				cell.setCellValue("att.");
+				cell.setCellStyle(wrapText);
+				CreationHelper helper = workbook.getCreationHelper();
+				Hyperlink link = helper.createHyperlink(HyperlinkType.FILE);
+				link.setAddress(problem.getAttachmentSrc().replace("/disk/" + productId + "/", ""));
+				cell.setHyperlink(link);
+				srcFiles.add(Main.getUploadPath().replace("disk/", "") + problem.getAttachmentSrc());
+			}
+		}
+		return rowNum;
+	}
+
 
 	public String getReportName(long reportId) {
 		ReportEntity report = findOne(reportId);

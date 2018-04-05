@@ -148,14 +148,18 @@
                 <td id="descriptionTd" th:text="${problem.description}">Description</td>
                 <td>
                     <div th:if="${problem.warning == 1}">
-                        <img class="warning-icon" src="img/ctq.png"/>
+                        <img class="warning-icon pop-warning" src="img/ctq.png" data-content="Krytyczny dla jakości"
+                             data-placement="right" data-toggle="popover" data-html="true"/>
                     </div>
                     <div th:if="${problem.warning == 2}">
-                        <img class="warning-icon" src="img/otd.png"/>
+                        <img class="warning-icon pop-warning" src="img/otd.png" data-content="Zagrożenie terminu dostawy"
+                             data-placement="right" data-toggle="popover" data-html="true"/>
                     </div>
                     <div th:if="${problem.warning == 3}">
-                        <img class="warning-icon" src="img/ctq.png"/><br />
-                        <img class="warning-icon" src="img/otd.png"/>
+                        <img class="warning-icon pop-warning" src="img/ctq.png" data-content="Krytyczny dla jakości"
+                             data-placement="right" data-toggle="popover" data-html="true"/><br />
+                        <img class="warning-icon pop-warning" src="img/otd.png" data-content="Zagrożenie terminu dostawy"
+                             data-placement="right" data-toggle="popover" data-html="true"/>
                     </div>
                 </td>
                 <td id="imgTd">
