@@ -395,7 +395,6 @@ public class ReportsService {
 		row.getCell(0).setCellStyle(boldText);
 		rowNum++;
 		int k = 1;
-		//TODO 1
 		for (String reportAttachmentSrc : report.getAttachmentSrc()) {
 			row = sheet.createRow((short) rowNum);
 			cell = row.createCell(0);
