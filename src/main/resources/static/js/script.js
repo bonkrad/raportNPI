@@ -61,6 +61,8 @@ function saveProblem() {
     formData.append('author', 1682);
     formData.append('priority', $('#priorityControlSelect').val());
     formData.append('closed', $('#statusControlSelect').val());
+//    formData.append('_csrf', $("input[name='_csrf']").val());
+
     var warning1 =0;
     var warning2 =0;
     if($('#gridCheck1').is(':checked')) {
@@ -222,6 +224,7 @@ $(document).ready(function() {
         var formData = new FormData();
         formData.append('summary', $('#economicalSummaryTextArea').val());
         formData.append('conclusion', $('#summaryTextArea').val());
+//        formData.append('_csrf', $("input[name='_csrf']").val());
         var input = document.querySelector('#economicalSummaryFileInput');
         var curFiles = input.files;
         if (curFiles.length === 0) {
@@ -293,9 +296,13 @@ $(document).ready(function() {
 
     $('#tasksBlock').on('click', '.btnSendReminder', function() {
         var reminderUrl = $(this).attr('value');
+        var _csrf = $("input[name='_csrf']").val();
         $.ajax({
             type: "POST",
             url: reminderUrl,
+//            data: {
+//                _csrf: _csrf
+//            },
             beforeSend: function() {},
             success: function(response) {
                 alert('Wysłano powiadomienie');
@@ -309,10 +316,14 @@ $(document).ready(function() {
 
     $('#resultsBlock').on('click', '.btnDelete', function() {
         var deleteUrl = $(this).attr('value');
+        var _csrf = $("input[name='_csrf']").val();
         $.ajax({
             type: "POST",
             url: deleteUrl, //'/products?id=' + $('#productID').val() + '&rev=' + $('#reportRev').val() + '&problemId=' + $('#reportRev').val(),
             //data : problem,
+//            data: {
+//                 _csrf: _csrf
+//            },
             beforeSend: function() {
                 $('#popup').attr('class', 'active')
             },
@@ -342,9 +353,13 @@ $(document).ready(function() {
 
     $('#tasksBlock').on('click', '.btnDeleteTask', function() {
         var deleteTaskUrl = $(this).attr('value');
+        var _csrf = $("input[name='_csrf']").val();
         $.ajax({
             type: "POST",
             url: deleteTaskUrl,
+//            data: {
+//                _csrf: _csrf
+//            },
             beforeSend: function() {
                 $('#popup').attr('class', 'active')
             },
@@ -406,6 +421,7 @@ $(document).ready(function() {
                 formData.append('attachment', curFiles[0]);
             }
         }
+//        formData.append('_csrf', $("input[name='_csrf']").val());
 
         $.ajax({
             type: 'POST',
@@ -460,6 +476,7 @@ $(document).ready(function() {
         formData.append('rDate', $('#addTaskRequiredDateInput').val());
         formData.append('author', 1682);
         formData.append('closed', $('#addTaskStatusControlSelect').val());
+//            formData.append('_csrf', $("input[name='_csrf']").val());
 
         $.ajax({
             type: 'POST',
@@ -505,6 +522,7 @@ $(document).ready(function() {
         formData.append('rDate', $('#editTaskRequiredDateInput').val());
         formData.append('author', 1682);
         formData.append('closed', $('#editTaskStatusControlSelect').val());
+//            formData.append('_csrf', $("input[name='_csrf']").val());
 
         $.ajax({
             type: 'POST',

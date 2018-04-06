@@ -24,7 +24,7 @@ public class ProblemEntity {
 	@Temporal(TemporalType.TIMESTAMP)
 	private Calendar timestamp;
 
-	private int author;
+	private String author;
 	private int priority;
 	private int warning;
 
@@ -40,7 +40,7 @@ public class ProblemEntity {
 
 	}
 
-	public ProblemEntity(String description, String recommendation, List<String> imgSrc,String attachmentSrc, String category, String answer, int author, int priority, Boolean closed) {
+	public ProblemEntity(String description, String recommendation, List<String> imgSrc,String attachmentSrc, String category, String answer, String author, int priority, Boolean closed) {
 		this.description = description;
 		this.recommendation = recommendation;
 		this.imgSrc = imgSrc;
@@ -117,11 +117,11 @@ public class ProblemEntity {
 		this.timestamp = Calendar.getInstance();
 	}
 
-	public int getAuthor() {
+	public String getAuthor() {
 		return author;
 	}
 
-	public void setAuthor(int author) {
+	public void setAuthor(String author) {
 		this.author = author;
 	}
 

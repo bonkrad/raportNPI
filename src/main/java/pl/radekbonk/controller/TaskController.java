@@ -1,6 +1,7 @@
 package pl.radekbonk.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -20,15 +21,17 @@ public class TaskController {
 	private EmailService emailService;
 
 	@PostMapping(value = "/task", params = {"reportId"})
-	public ModelAndView insertTask(@RequestParam(value = "reportId") long reportId, Model model, TaskEntity taskEntity, @RequestParam("rDate") String date) {
+	public ModelAndView insertTask(@RequestParam(value = "reportId") long reportId, Model model, TaskEntity taskEntity, @RequestParam("rDate") String date, Authentication authentication) {
+		taskEntity.setAuthor(authentication.getPrincipal().toString().replace("SBS\\",""));
 		tasksService.save(taskEntity, reportId, date);
 		return new ModelAndView("redirect:/tasks?reportId=" + reportId);
 	}
 
 	@PostMapping(value = "/updateTask", params = {"taskId"})
-	public ModelAndView updateTask(@RequestParam(value = "taskId") long taskId, Model model, TaskEntity taskEntity, @RequestParam("rDate") String date) {
+	public ModelAndView updateTask(@RequestParam(value = "taskId") long taskId, Model model, TaskEntity taskEntity, @RequestParam("rDate") String date, Authentication authentication) {
 		long reportId = tasksService.getTaskById(taskId).getReport().getId();
 		taskEntity.setId(taskId);
+		taskEntity.setAuthor(authentication.getPrincipal().toString().replace("SBS\\",""));
 		tasksService.save(taskEntity, reportId, date);
 		return new ModelAndView("redirect:/tasks?reportId=" + reportId);
 	}

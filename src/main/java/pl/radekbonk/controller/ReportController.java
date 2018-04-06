@@ -1,6 +1,7 @@
 package pl.radekbonk.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -88,9 +89,9 @@ public class ReportController {
 
 	@PostMapping(value = "/report", params = {"productId"})
 	@ResponseBody
-	public String createReport(@RequestParam(value = "productId") long productId, @RequestParam(value= "copyLast") boolean copyLast) {
-		System.out.println(copyLast);
-		ReportEntity newReport = new ReportEntity(reportsService.getNewRevision(productId), 1682, "", new ArrayList<>(), "", "");
+	public String createReport(@RequestParam(value = "productId") long productId, @RequestParam(value= "copyLast") boolean copyLast, Authentication authentication) {
+//		System.out.println(copyLast);
+		ReportEntity newReport = new ReportEntity(reportsService.getNewRevision(productId), authentication.getPrincipal().toString().replace("SBS\\",""), "", new ArrayList<>(), "", "");
 		newReport.setProduct(productsService.getProductById(productId));
 		reportsService.save(newReport,copyLast, productId);
 		return "/products?productId="+productId+"&reportId="+ newReport.getId();

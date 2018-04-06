@@ -520,7 +520,6 @@ public class ReportsService {
 			cell.setCellStyle(borderThinRed);
 
 			cell = row.createCell(4);
-			//TODO
 			if (!problem.getImgSrc().isEmpty()) {
 				i++;
 				cell.setCellValue("fig" + i);

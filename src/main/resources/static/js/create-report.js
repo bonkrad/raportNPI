@@ -4,10 +4,12 @@ $(document).ready(function() {
         if ($('#revisionControlSelect').val() != "0") {
             $('#createReportBlock').attr('class', 'active')
         } else {
+//            var _csrf = $("input[name='_csrf']").val();
             $.ajax({
                         type: "POST",
                         data: {
-                            copyLast: false
+                            copyLast: false,
+//                            _csrf: _csrf
                         },
                         url: createReportUrl,
                         beforeSend: function() {},
@@ -27,10 +29,12 @@ $(document).ready(function() {
 
 $('#createReportBlock').on('click', '.btnCreateReportButtonYes', function() {
 var createReportUrl = '/report?productId=' + $('#productId').val();
+//var _csrf = $("input[name='_csrf']").val();
         $.ajax({
                     type: "POST",
                     data: {
-                        copyLast: true
+                        copyLast: true,
+                        //_csrf: _csrf
                     },
                     url: createReportUrl,
                     beforeSend: function() {},
@@ -47,10 +51,12 @@ var createReportUrl = '/report?productId=' + $('#productId').val();
 
     $('#createReportBlock').on('click', '.btnCreateReportButtonNo', function() {
             var createReportUrl = '/report?productId=' + $('#productId').val();
+//            var _csrf = $("input[name='_csrf']").val();
                     $.ajax({
                                 type: "POST",
                                 data: {
-                                    copyLast: false
+                                    copyLast: false,
+//                                    _csrf: _csrf
                                 },
                                 url: createReportUrl,
                                 beforeSend: function() {},

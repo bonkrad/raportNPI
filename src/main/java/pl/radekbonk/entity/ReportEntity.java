@@ -17,7 +17,7 @@ public class ReportEntity {
 	@Temporal(TemporalType.TIMESTAMP)
 	private Calendar timestamp;
 
-	private int author;
+	private String author;
 
 	private String imgSrc;
 
@@ -34,7 +34,7 @@ public class ReportEntity {
 
 	}
 
-	public ReportEntity(BigDecimal revision, int author, String imgSrc, List<String> attachmentSrc, String summary, String conclusion) {
+	public ReportEntity(BigDecimal revision, String author, String imgSrc, List<String> attachmentSrc, String summary, String conclusion) {
 		this.revision = revision;
 		this.author = author;
 		this.imgSrc = imgSrc;
@@ -68,11 +68,11 @@ public class ReportEntity {
 		this.timestamp = timestamp;
 	}
 
-	public int getAuthor() {
+	public String getAuthor() {
 		return author;
 	}
 
-	public void setAuthor(int author) {
+	public void setAuthor(String author) {
 		this.author = author;
 	}
 

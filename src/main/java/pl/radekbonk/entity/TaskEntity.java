@@ -26,7 +26,7 @@ public class TaskEntity {
 	@Temporal(TemporalType.TIMESTAMP)
 	private Calendar timestamp;
 	
-	private int author;
+	private String author;
 	
 	private Boolean closed;
 	
@@ -38,7 +38,7 @@ public class TaskEntity {
 	}
 
 	
-	public TaskEntity(String description, String comment, int responsibleWorker, Calendar requiredDate, Calendar closedDate, int author, Boolean closed) {
+	public TaskEntity(String description, String comment, int responsibleWorker, Calendar requiredDate, Calendar closedDate, String author, Boolean closed) {
 		this.description = description;
 		this.comment = comment;
 		this.responsibleWorker = responsibleWorker;
@@ -105,11 +105,11 @@ public class TaskEntity {
 		this.timestamp = Calendar.getInstance();
 	}
 	
-	public int getAuthor() {
+	public String getAuthor() {
 		return author;
 	}
 	
-	public void setAuthor(int author) {
+	public void setAuthor(String author) {
 		this.author = author;
 	}
 	
