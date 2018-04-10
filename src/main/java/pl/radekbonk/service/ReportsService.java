@@ -5,6 +5,7 @@ import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.ss.util.RegionUtil;
 import org.apache.poi.util.IOUtils;
+import org.apache.poi.xssf.usermodel.XSSFPrintSetup;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -417,6 +418,12 @@ public class ReportsService {
 		row = sheet.createRow((short) rowNum);
 		row.createCell(0).setCellValue(report.getConclusion());
 
+		workbook.setPrintArea(0,0,9,0,rowNum);
+
+		sheet.getPrintSetup().setPaperSize(XSSFPrintSetup.A4_PAPERSIZE);
+		sheet.getPrintSetup().setLandscape(true);
+		sheet.setDisplayGridlines(true);
+
 		try (FileOutputStream outputStream = new FileOutputStream(realPathToUploads + fileName)) {
 			workbook.write(outputStream);
 			workbook.close();
@@ -466,6 +473,7 @@ public class ReportsService {
 		cell = row.createCell(3);
 		cell.setCellValue("Zagrożenie");
 		cell.setCellStyle(borderThin);
+		sheet.autoSizeColumn(cell.getColumnIndex());
 		cell = row.createCell(4);
 		cell.setCellValue("Zdjęcie");
 		CellRangeAddress cellRangeAddress = new CellRangeAddress(row.getRowNum(), row.getRowNum(), 4, 5);
@@ -576,7 +584,7 @@ public class ReportsService {
 	}
 
 
-	public String getReportName(long reportId) {
+	private String getReportName(long reportId) {
 		ReportEntity report = findOne(reportId);
 		long productId = report.getProduct().getId();
 		BigDecimal reportRev = report.getRevision();

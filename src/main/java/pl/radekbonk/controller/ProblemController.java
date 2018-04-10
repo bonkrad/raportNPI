@@ -4,10 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 import pl.radekbonk.entity.ProblemEntity;
@@ -16,6 +13,8 @@ import pl.radekbonk.entity.TaskEntity;
 import pl.radekbonk.service.ProblemsService;
 import pl.radekbonk.service.ProductsService;
 import pl.radekbonk.service.ReportsService;
+
+import java.util.regex.Pattern;
 
 @Controller
 @RequestMapping("/")
@@ -78,15 +77,12 @@ public class ProblemController {
 
 	@PostMapping(value = "/update", params = {"problemId"})
 	public ModelAndView updateProblem(@RequestParam(value = "problemId") long problemId, Model model, ProblemEntity problemEntity, @RequestParam(value = "images[]", required = false) MultipartFile[] images, @RequestParam(value = "attachment", required = false) MultipartFile attachment, @RequestParam(value = "imagesToDelete[]", required = false) String[] imagesToDelete, Authentication authentication) {
-		/*for(String url: imagesToDelete) {
-			System.out.println(url);
-		}*/
 		ProblemEntity oldProblem = problemsService.getProblemById(problemId);
 		long reportId = oldProblem.getReport().getId();
 		problemEntity.setId(problemId);
 		problemEntity.setAttachmentSrc(oldProblem.getAttachmentSrc());
 		problemEntity.setImgSrc(oldProblem.getImgSrc());
-		problemEntity.setAuthor(authentication.getPrincipal().toString().replace("SBS\\",""));
+		problemEntity.setAuthor(authentication.getPrincipal().toString().split(Pattern.quote("\\"))[1]);
 		if(imagesToDelete.length>0) {
 			problemEntity = problemsService.removeImages(problemEntity, imagesToDelete);
 		}
@@ -102,9 +98,21 @@ public class ProblemController {
 		return new ModelAndView("redirect:/products/problems?reportId=" + reportId);
 	}
 
+	@PostMapping(value = "/updateAnswer", params = {"problemId"})
+	@ResponseBody
+	public void updateProblem(@RequestParam(value = "problemId") long problemId, @RequestParam(value = "answer", required = false) String answer, Authentication authentication) {
+		/*for(String url: imagesToDelete) {
+			System.out.println(url);
+		}*/
+		ProblemEntity oldProblem = problemsService.getProblemById(problemId);
+		long reportId = oldProblem.getReport().getId();
+		oldProblem.setAnswer(answer);
+		problemsService.save(oldProblem, reportId);
+	}
+
 	@PostMapping(value = "/products", params = {"reportId"})
 	public ModelAndView insertProblem(@RequestParam(value = "reportId") long reportId, Model model, ProblemEntity problemEntity, @RequestParam(value = "images[]", required = false) MultipartFile[] images, @RequestParam(value = "attachment", required = false) MultipartFile attachment, Authentication authentication) {
-		problemEntity.setAuthor(authentication.getPrincipal().toString().replace("SBS\\",""));
+		problemEntity.setAuthor(authentication.getPrincipal().toString().split(Pattern.quote("\\"))[1]);
 		if (images.length==0  && attachment == null) {
 			problemsService.save(problemEntity, reportId);
 		} else if (images.length > 0 && attachment == null) {

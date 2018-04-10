@@ -20,6 +20,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.regex.Pattern;
 
 @Controller
 @RequestMapping("/")
@@ -71,6 +72,22 @@ public class ReportController {
 		}
 	}
 
+	@GetMapping(value = "/viewReportClient", params = "reportId")
+	public ModelAndView viewReportClient(@RequestParam(value = "reportId") long reportId, Model model) {
+		ReportEntity report = reportsService.findOne(reportId);
+		model.addAttribute("productIdAx", report.getProduct().getId());
+		model.addAttribute("reportRev", report.getRevision());
+		model.addAttribute("reportId", reportId);
+		model.addAttribute("productName", reportsService.findOne(reportId).getProduct().getName());
+		model.addAttribute("reports", reportsService.findByProductIdOrderByRevisionDesc(report.getProduct().getId()));
+		model.addAttribute("majorProblems", problemsService.findMajorByReportId(reportId));
+		model.addAttribute("minorProblems", problemsService.findMinorByReportId(reportId));
+		model.addAttribute("summary", report.getSummary());
+		model.addAttribute("conclusion", report.getConclusion());
+		model.addAttribute("report",reportsService.findOne(reportId));
+		return new ModelAndView("page_view_report_client");
+	}
+
 
 	@GetMapping(value = "/products", params = {"id"})
 	public ModelAndView getReportById(@RequestParam(value = "id") long id, Model model) {
@@ -90,8 +107,7 @@ public class ReportController {
 	@PostMapping(value = "/report", params = {"productId"})
 	@ResponseBody
 	public String createReport(@RequestParam(value = "productId") long productId, @RequestParam(value= "copyLast") boolean copyLast, Authentication authentication) {
-//		System.out.println(copyLast);
-		ReportEntity newReport = new ReportEntity(reportsService.getNewRevision(productId), authentication.getPrincipal().toString().replace("SBS\\",""), "", new ArrayList<>(), "", "");
+		ReportEntity newReport = new ReportEntity(reportsService.getNewRevision(productId), authentication.getPrincipal().toString().split(Pattern.quote("\\"))[1], "", new ArrayList<>(), "", "");
 		newReport.setProduct(productsService.getProductById(productId));
 		reportsService.save(newReport,copyLast, productId);
 		return "/products?productId="+productId+"&reportId="+ newReport.getId();

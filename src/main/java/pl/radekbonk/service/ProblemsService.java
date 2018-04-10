@@ -20,12 +20,6 @@ import java.util.UUID;
 @Service
 public class ProblemsService {
 
-	//TODO
-	public final static String FILE_UPLOAD_PATH = "H://disk/";
-
-	//TODO
-//	public final static String FILE_UPLOAD_PATH="/home/pi/raport/disk/";
-
 	@Autowired
 	private ProblemRepository problemRepository;
 

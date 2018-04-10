@@ -10,6 +10,8 @@ import pl.radekbonk.entity.TaskEntity;
 import pl.radekbonk.service.EmailService;
 import pl.radekbonk.service.TasksService;
 
+import java.util.regex.Pattern;
+
 @Controller
 @RequestMapping("/")
 public class TaskController {
@@ -31,7 +33,7 @@ public class TaskController {
 	public ModelAndView updateTask(@RequestParam(value = "taskId") long taskId, Model model, TaskEntity taskEntity, @RequestParam("rDate") String date, Authentication authentication) {
 		long reportId = tasksService.getTaskById(taskId).getReport().getId();
 		taskEntity.setId(taskId);
-		taskEntity.setAuthor(authentication.getPrincipal().toString().replace("SBS\\",""));
+		taskEntity.setAuthor(authentication.getPrincipal().toString().split(Pattern.quote("\\"))[1]);
 		tasksService.save(taskEntity, reportId, date);
 		return new ModelAndView("redirect:/tasks?reportId=" + reportId);
 	}

@@ -26,9 +26,9 @@
            th:name="${_csrf.parameterName}"
            th:value="${_csrf.token}"/>-->
     <h1 class="h-margin">
-        <p id="id" th:text="${productIdAx + ' ' + productName + ' rev. ' + reportRev}"></p>
+        <p id="id" th:text="${productIdAx + ' ' + productName}"></p>
     </h1>
-    <form action="#" th:action="@{/products}" method="get">
+    <!--<form action="#" th:action="@{/products}" method="get">
         <div class="input-group mb-3">
             <div class="input-group-prepend">
                 <span class="input-group-text" id="basic-addon1">Produkt</span>
@@ -58,26 +58,26 @@
                 <button class="btn btn-outline-secondary" type="button" id="createReportButton">Nowy</button>
             </div>
         </div>
-    </form>
+    </form>-->
     <div>
         <div class="text-center" id="raport">
-            <h2 class="h-margin">Raport</h2>
+            <h2 class="h-margin">NPI Report</h2>
         </div>
         <div class="text-center">
-            <h4 class="h-margin">Krytyczne - wymagane zamknięcie przed kolejną produkcją</h4>
+            <h4 class="h-margin">Critical - issues need to be closed before MP</h4>
         </div>
         <table class="table table-hover table-bordered table-responsive-xl">
             <thead>
             <tr>
                 <th scope="col">#</th>
-                <th scope="col">Priorytet</th>
-                <th scope="col">Kategoria</th>
-                <th scope="col">Opis</th>
+                <th scope="col">Priority</th>
+                <th scope="col">Category</th>
+                <th scope="col">Description</th>
                 <th scope="col"></th>
-                <th scope="col">Zdjęcia</th>
-                <th scope="col">Zalecenie/ Akcje Assel</th>
+                <th scope="col">Pictures</th>
+                <th scope="col">Assel Recommendation/Action</th>
                 <th scope="col">Status</th>
-                <th scope="col">Odpowiedź klienta</th>
+                <th scope="col">Client reply</th>
             </tr>
             </thead>
             <tbody>
@@ -88,15 +88,15 @@
                 <td id="descriptionTd" th:text="${problem.description}">Description</td>
                 <td>
                     <div th:if="${problem.warning == 1}">
-                        <img class="warning-icon pop-warning" src="img/ctq.png" data-content="Krytyczny dla jakości"
+                        <img class="warning-icon pop-warning" src="img/ctq.png" data-content="Critical to Quality"
                              data-placement="right" data-toggle="popover" data-html="true"/>
                     </div>
                     <div th:if="${problem.warning == 2}">
-                        <img class="warning-icon pop-warning" src="img/otd.png" data-content="Zagrożenie terminu dostawy"
+                        <img class="warning-icon pop-warning" src="img/otd.png" data-content="Threat for On Time Delivery"
                              data-placement="right" data-toggle="popover" data-html="true"/>
                     </div>
                     <div th:if="${problem.warning == 3}">
-                        <img class="warning-icon pop-warning" src="img/ctq.png" data-content="Krytyczny dla jakości"
+                        <img class="warning-icon pop-warning" src="img/ctq.png" data-content="Threat for On Time Delivery"
                              data-placement="right" data-toggle="popover" data-html="true"/><br />
                         <img class="warning-icon pop-warning" src="img/otd.png" data-content="Zagrożenie terminu dostawy"
                              data-placement="right" data-toggle="popover" data-html="true"/>
@@ -128,20 +128,20 @@
             </tbody>
         </table>
         <div class="text-center">
-            <h4 class="h-margin">Pozostałe obserwacje</h4>
+            <h4 class="h-margin">Other observations</h4>
         </div>
         <table class="table table-hover table-bordered table-responsive-xl">
             <thead>
             <tr>
                 <th scope="col">#</th>
-                <th scope="col">Priorytet</th>
-                <th scope="col">Kategoria</th>
-                <th scope="col">Opis</th>
+                <th scope="col">Priority</th>
+                <th scope="col">Category</th>
+                <th scope="col">Description</th>
                 <th scope="col"></th>
-                <th scope="col">Zdjęcia</th>
-                <th scope="col">Zalecenie/ Akcje Assel</th>
+                <th scope="col">Pictures</th>
+                <th scope="col">Assel Recommendation/Action</th>
                 <th scope="col">Status</th>
-                <th scope="col">Odpowiedź klienta</th>
+                <th scope="col">Client reply</th>
             </tr>
             </thead>
             <tbody>
@@ -152,15 +152,15 @@
                 <td id="descriptionTd" th:text="${problem.description}">Description</td>
                 <td>
                     <div th:if="${problem.warning == 1}">
-                        <img class="warning-icon pop-warning" src="img/ctq.png" data-content="Krytyczny dla jakości"
+                        <img class="warning-icon pop-warning" src="img/ctq.png" data-content="Critical to Quality"
                              data-placement="right" data-toggle="popover" data-html="true"/>
                     </div>
                     <div th:if="${problem.warning == 2}">
-                        <img class="warning-icon pop-warning" src="img/otd.png" data-content="Zagrożenie terminu dostawy"
+                        <img class="warning-icon pop-warning" src="img/otd.png" data-content="Threat for On Time Delivery"
                              data-placement="right" data-toggle="popover" data-html="true"/>
                     </div>
                     <div th:if="${problem.warning == 3}">
-                        <img class="warning-icon pop-warning" src="img/ctq.png" data-content="Krytyczny dla jakości"
+                        <img class="warning-icon pop-warning" src="img/ctq.png" data-content="Threat for On Time Delivery"
                              data-placement="right" data-toggle="popover" data-html="true"/><br />
                         <img class="warning-icon pop-warning" src="img/otd.png" data-content="Zagrożenie terminu dostawy"
                              data-placement="right" data-toggle="popover" data-html="true"/>
@@ -181,7 +181,7 @@
                 <td id="attachmentTd">
                     <div>
                         <a th:unless="${problem.attachmentSrc}==''" target="_blank" th:href="${problem.attachmentSrc}">
-                            <button class="btn btn-outline-secondary pop-button" type="button" data-content="Załącznik"
+                            <button class="btn btn-outline-secondary pop-button" type="button" data-content="Attachments"
                                     data-placement="left" data-toggle="popover" data-html="true">
                                 <img class="glyph-icon" src="img/glyphicons-63-paperclip.png"/>
                             </button>
@@ -192,7 +192,7 @@
             </tbody>
         </table>
     </div>
-    <div>
+    <!--<div>
         <div class="row" id="tasks">
             <div class="col-sm">
                 <div class="form-group">
@@ -224,12 +224,12 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div>-->
     <div>
         <div class="row">
             <div class="col-sm">
                 <div class="form-group">
-                    <h6 class="h-margin">Podsumowanie ekonomiczne</h6>
+                    <h6 class="h-margin">Economical summary</h6>
                     <p id="economicalSummaryTextArea" th:text="${summary}"></p>
                 </div>
             </div>
@@ -237,12 +237,12 @@
         <div class="row">
             <div class="col-sm">
                 <div class="form-group">
-                    <h6 class="h-margin">Załączniki</h6>
+                    <h6 class="h-margin">Report attachments</h6>
                 </div>
                 <div class="row attachment">
                     <div th:each="src : ${report.attachmentSrc}" class="mr-2 mb-2">
                         <a target="_blank" th:href="${src}">
-                            <button class="btn btn-outline-secondary pop-button" type="button" data-content="Załącznik"
+                            <button class="btn btn-outline-secondary pop-button" type="button" data-content="Attachments"
                                     data-placement="left" data-toggle="popover" data-html="true">
                                 <img class="glyph-icon" src="img/glyphicons-63-paperclip.png"/>
                             </button>
@@ -254,7 +254,7 @@
         <div class="row">
             <div class="col-sm">
                 <div class="form-group">
-                    <h6 class="h-margin">Wnioski NPI</h6>
+                    <h6 class="h-margin">NPI Conclusion</h6>
                     <p id="summaryTextArea" th:text="${conclusion}"></p>
                 </div>
             </div>
@@ -262,7 +262,7 @@
     </div>
 
 </div>
-<div id="createReportBlock">
+<!--<div id="createReportBlock">
     <div class="container">
         <div class="questionForm">
             <div class="mb-3">
@@ -281,7 +281,7 @@
             </div>
         </div>
     </div>
-</div>
+</div>-->
 <div id="popup">
     <div class="container">
         <h1>Wczytywanie....</h1>
@@ -293,9 +293,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
 <script src="js/script.js"></script>
-<script src="js/create-report.js"></script>
 <script src="js/edit-report.js"></script>
-<script src="js/files.js"></script>
 
 </html>
 
