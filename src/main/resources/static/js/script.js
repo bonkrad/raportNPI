@@ -185,9 +185,9 @@ $(document).ready(function() {
             //$('#editImageA').attr('href', $(this).closest('tr').find('a').attr('href'));
             //$('#editImageA').attr('target', '_blank');
             //var urls = [];
-            $(this).closest('tr').find('a').each(function () {
+            $(this).closest('tr').find('.img-fluid').each(function () {
                 //urls.push($(this).attr('href'));
-                var html = '<a href="' + $(this).attr('href') + '" target="_blank"><div class="image"><img class="img img-responsive full-width img-thumb" alt="image" src=' + $(this).attr('href') + '></image></div></a><img class="remove-image" src="img/glyphicons-208-remove.png" />';
+                var html = '<a href="' + $(this).attr('src') + '" target="_blank"><div class="image"><img class="img img-responsive full-width img-thumb" alt="image" src=' + $(this).attr('src') + '></image></div></a><img class="remove-image" src="img/glyphicons-208-remove.png" />';
                 $('#editImageContainer').append(html);
                 //imagesToDelete.push($(this).attr('href'));
             });
