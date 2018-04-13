@@ -119,7 +119,7 @@ public class ProblemsService {
 	}
 
 	private ProblemEntity problemWithImg(ProblemEntity problemEntity, MultipartFile[] images, long reportId) {
-		long productId = reportsService.findOne(reportId).getProduct().getId();
+		long productId = reportsService.findOne(reportId).getProductId();
 		List<String> imgSources = problemEntity.getImgSrc();
 		if (images.length > 0) {
 			for (MultipartFile image : images) {
@@ -148,7 +148,7 @@ public class ProblemsService {
 	}
 
 	private ProblemEntity problemWithAttachment(ProblemEntity problemEntity, MultipartFile attachment, long reportId) {
-		long productId = reportsService.findOne(reportId).getProduct().getId();
+		long productId = reportsService.findOne(reportId).getProductId();
 		if (!attachment.isEmpty()) {
 			try {
 				String realPathToUploads = Main.getUploadPath() + productId + "/";

@@ -27,14 +27,16 @@ public class ReportEntity {
 	private String summary;
 	private String conclusion;
 
-	@ManyToOne
-	private ProductEntity product;
+	/*@ManyToOne
+	private ProductEntity product;*/
+
+	private long productId;
 
 	public ReportEntity() {
 
 	}
 
-	public ReportEntity(BigDecimal revision, String author, String imgSrc, List<String> attachmentSrc, String summary, String conclusion) {
+	public ReportEntity(BigDecimal revision, String author, String imgSrc, List<String> attachmentSrc, String summary, String conclusion, long productId) {
 		this.revision = revision;
 		this.author = author;
 		this.imgSrc = imgSrc;
@@ -42,6 +44,7 @@ public class ReportEntity {
 		this.summary = summary;
 		this.conclusion = conclusion;
 		this.timestamp = Calendar.getInstance();
+		this.productId = productId;
 	}
 
 	public long getId() {
@@ -108,11 +111,11 @@ public class ReportEntity {
 		this.conclusion = conclusion;
 	}
 
-	public ProductEntity getProduct() {
-		return product;
+	public long getProductId() {
+		return productId;
 	}
 
-	public void setProduct(ProductEntity product) {
-		this.product = product;
+	public void setProductId(long productId) {
+		this.productId = productId;
 	}
 }

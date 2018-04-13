@@ -7,11 +7,11 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
+import pl.radekbonk.service.ProductClient;
 import pl.radekbonk.entity.ProblemEntity;
 import pl.radekbonk.entity.ReportEntity;
 import pl.radekbonk.entity.TaskEntity;
 import pl.radekbonk.service.ProblemsService;
-import pl.radekbonk.service.ProductsService;
 import pl.radekbonk.service.ReportsService;
 
 import java.util.regex.Pattern;
@@ -20,28 +20,33 @@ import java.util.regex.Pattern;
 @RequestMapping("/")
 public class ProblemController {
 
-	@Autowired
-	private ProductsService productsService;
+	/*@Autowired
+	private ProductsService productsService;*/
+
 	@Autowired
 	private ReportsService reportsService;
+
 	@Autowired
 	private ProblemsService problemsService;
 
+	@Autowired
+	private ProductClient productClient;
 
 	@GetMapping(value = "/products", params = {"reportId", "productId"})
 	public ModelAndView getReportById(@RequestParam(value = "reportId") long reportId, @RequestParam(value = "productId") long productId, Model model, Authentication auth) {
+		String productName = productClient.getName(String.valueOf(productId));
 		try {
 			ReportEntity report = reportsService.findOne(reportId);
-			if (productId == report.getProduct().getId()) {
-				model.addAttribute("productIdAx", report.getProduct().getId());
+			if (productId == report.getProductId()) {
+				model.addAttribute("productIdAx", productClient.checkId(String.valueOf(productId)));
 			} else {
 				System.out.println("Product Id Conflict");
 				throw new NullPointerException("Product Id conflict");
 			}
 			model.addAttribute("reportRev", report.getRevision());
 			model.addAttribute("reportId", reportId);
-			model.addAttribute("productName", reportsService.findOne(reportId).getProduct().getName());
-			model.addAttribute("reports", reportsService.findByProductIdOrderByRevisionDesc(report.getProduct().getId()));
+			model.addAttribute("productName", productName);
+			model.addAttribute("reports", reportsService.findByProductIdOrderByRevisionDesc(productId));
 			model.addAttribute("problem", new ProblemEntity());
 			model.addAttribute("task", new TaskEntity());
 			/*model.addAttribute("user",auth.getName());*/
@@ -50,8 +55,8 @@ public class ProblemController {
 		} catch (NullPointerException e) {
 			System.out.println("No such a report");
 			model.addAttribute("alert", "Wybierz poprawny raport lub utwórz nowy");
-			model.addAttribute("productIdAx", productId);
-			model.addAttribute("productName", productsService.getProductById(productId).getName());
+			model.addAttribute("productIdAx", productClient.checkId(String.valueOf(productId)));
+			model.addAttribute("productName", productName);
 			model.addAttribute("reports", reportsService.findByProductIdOrderByRevisionDesc(productId));
 			return new ModelAndView("page_revision");
 		}

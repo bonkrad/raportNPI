@@ -36,8 +36,11 @@ public class ReportsService {
 	@Autowired
 	private ProblemsService problemsService;
 
+	/*@Autowired
+	private ProductsService productsService;*/
+
 	@Autowired
-	private ProductsService productsService;
+	private ProductClient productClient;
 
 	@Autowired
 	private HttpServletRequest request;
@@ -101,7 +104,7 @@ public class ReportsService {
 	}
 
 	public ReportEntity reportWithAttachment(ReportEntity reportEntity, MultipartFile[] attachments) {
-		long productId = reportEntity.getProduct().getId();
+		long productId = reportEntity.getProductId();
 		List<String> attachmentSources = reportEntity.getAttachmentSrc();
 		if (attachments.length > 0) {
 			for (MultipartFile attachment : attachments) {
@@ -174,7 +177,7 @@ public class ReportsService {
 	public String generateExcel(long reportId) throws IOException {
 		i = 0;
 		srcFiles.clear();
-		long productId = findOne(reportId).getProduct().getId();
+		long productId = findOne(reportId).getProductId();
 		String realPathToUploads = Main.getUploadPath() + productId + "/";
 		if (!new File(realPathToUploads).exists()) {
 			new File(realPathToUploads).mkdir();
@@ -184,7 +187,8 @@ public class ReportsService {
 		ZipOutputStream zipOut = new ZipOutputStream(fos);
 		ReportEntity report = findOne(reportId);
 
-		String productName = productsService.getProductById(productId).getName();
+		//String productName = productsService.getProductById(productId).getName();
+		String productName = productClient.getName(String.valueOf(productId));
 
 		String fileName = getReportName(reportId);
 
@@ -586,7 +590,7 @@ public class ReportsService {
 
 	private String getReportName(long reportId) {
 		ReportEntity report = findOne(reportId);
-		long productId = report.getProduct().getId();
+		long productId = report.getProductId();
 		BigDecimal reportRev = report.getRevision();
 		//String productName = productsService.getProductById(productId).getName();
 
@@ -595,7 +599,7 @@ public class ReportsService {
 
 	public String getReportNameZip(long reportId) {
 		ReportEntity reportEntity = findOne(reportId);
-		long productId = reportEntity.getProduct().getId();
+		long productId = reportEntity.getProductId();
 		BigDecimal reportRev = reportEntity.getRevision();
 
 		return productId + "-rev." + reportRev + ".zip";

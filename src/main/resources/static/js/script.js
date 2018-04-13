@@ -399,7 +399,7 @@ $(document).ready(function() {
         formData.append('recommendation', $('#editRecommendActionTextArea').val());
         formData.append('category', $('#editCategoryControlSelect').val());
         formData.append('answer', $('#editAnswerTextArea').val());
-        formData.append('author', 1682);
+        //formData.append('author', 1682);
         formData.append('priority', $('#editPriorityControlSelect').val());
         formData.append('closed', $('#editStatusControlSelect').val());
         formData.append('imagesToDelete[]', imagesToDelete);
@@ -468,13 +468,14 @@ $(document).ready(function() {
         var formData = new FormData();
         formData.append('description', $('#addTaskDescriptionTextArea').val());
         formData.append('comment', $('#addTaskComment').val());
-        if (isNaN(parseInt($('#addTaskResponsibleWorkerInput').val()))) {
+        /*if (isNaN(parseInt($('#addTaskResponsibleWorkerInput').val()))) {
             formData.append('responsibleWorker', 0);
         } else {
             formData.append('responsibleWorker', parseInt($('#addTaskResponsibleWorkerInput').val()));
-        }
+        }*/
+        formData.append('responsibleWorker', $('#addTaskResponsibleWorkerInput').val());
         formData.append('rDate', $('#addTaskRequiredDateInput').val());
-        formData.append('author', 1682);
+        //formData.append('author', 1682);
         formData.append('closed', $('#addTaskStatusControlSelect').val());
 //            formData.append('_csrf', $("input[name='_csrf']").val());
 
@@ -514,13 +515,14 @@ $(document).ready(function() {
         var formData = new FormData();
         formData.append('description', $('#editTaskDescriptionTextArea').val());
         formData.append('comment', $('#editTaskComment').val());
-        if (isNaN(parseInt($('#editTaskResponsibleWorkerInput').val()))) {
+        /*if (isNaN(parseInt($('#editTaskResponsibleWorkerInput').val()))) {
             formData.append('responsibleWorker', 0);
         } else {
             formData.append('responsibleWorker', parseInt($('#editTaskResponsibleWorkerInput').val()));
-        }
+        }*/
+        formData.append('responsibleWorker', $('#editTaskResponsibleWorkerInput').val());
         formData.append('rDate', $('#editTaskRequiredDateInput').val());
-        formData.append('author', 1682);
+        //formData.append('author', 1682);
         formData.append('closed', $('#editTaskStatusControlSelect').val());
 //            formData.append('_csrf', $("input[name='_csrf']").val());
 

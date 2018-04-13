@@ -54,11 +54,11 @@
             <artifactId>waffle-spring-security4</artifactId>
             <version>${waffle.version}</version>
         </dependency>
-        <!--<dependency>
+        <dependency>
             <groupId>com.microsoft.sqlserver</groupId>
             <artifactId>mssql-jdbc</artifactId>
             <scope>runtime</scope>
-        </dependency>-->
+        </dependency>
 
         <dependency>
             <groupId>com.h2database</groupId>
@@ -97,11 +97,16 @@
             <artifactId>jquery</artifactId>
             <version>3.2.1</version>
         </dependency>
+        <dependency>
+            <groupId>org.json</groupId>
+            <artifactId>json</artifactId>
+            <version>20180130</version>
+        </dependency>
 
     </dependencies>
 
     <build>
-        <pluginManagement>
+        <!--<pluginManagement>
             <plugins>
                 <plugin>
                     <groupId>org.jvnet.jaxb2.maven2</groupId>
@@ -125,7 +130,7 @@
                     </configuration>
                 </plugin>
             </plugins>
-        </pluginManagement>
+        </pluginManagement>-->
         <plugins>
             <plugin>
                 <groupId>org.jvnet.jaxb2.maven2</groupId>

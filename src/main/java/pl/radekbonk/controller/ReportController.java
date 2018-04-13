@@ -11,7 +11,7 @@ import pl.radekbonk.entity.ProblemEntity;
 import pl.radekbonk.entity.ReportEntity;
 import pl.radekbonk.entity.TaskEntity;
 import pl.radekbonk.service.ProblemsService;
-import pl.radekbonk.service.ProductsService;
+import pl.radekbonk.service.ProductClient;
 import pl.radekbonk.service.ReportsService;
 import pl.radekbonk.service.TasksService;
 
@@ -26,8 +26,8 @@ import java.util.regex.Pattern;
 @RequestMapping("/")
 public class ReportController {
 
-	@Autowired
-	private ProductsService productsService;
+	/*@Autowired
+	private ProductsService productsService;*/
 
 	@Autowired
 	private ProblemsService problemsService;
@@ -38,20 +38,25 @@ public class ReportController {
 	@Autowired
 	private TasksService tasksService;
 
+	@Autowired
+	private ProductClient productClient;
+
 	@GetMapping(value = "/viewReport", params = {"reportId", "productId"})
 	public ModelAndView getReportById(@RequestParam(value = "reportId") long reportId, @RequestParam(value = "productId") long productId, Model model) {
+		String productName = productClient.getName(String.valueOf(productId));
 		try {
 			ReportEntity report = reportsService.findOne(reportId);
-			if (productId == report.getProduct().getId()) {
-				model.addAttribute("productIdAx", report.getProduct().getId());
+			if (productId == report.getProductId()) {
+				model.addAttribute("productIdAx", productClient.checkId(String.valueOf(productId)));
 			} else {
 				System.out.println("Product Id Conflict");
 				throw new NullPointerException("Product Id conflict");
 			}
 			model.addAttribute("reportRev", report.getRevision());
 			model.addAttribute("reportId", reportId);
-			model.addAttribute("productName", reportsService.findOne(reportId).getProduct().getName());
-			model.addAttribute("reports", reportsService.findByProductIdOrderByRevisionDesc(report.getProduct().getId()));
+			//model.addAttribute("productName", reportsService.findOne(reportId).getProduct().getName());
+			model.addAttribute("productName", productName);
+			model.addAttribute("reports", reportsService.findByProductIdOrderByRevisionDesc(report.getProductId()));
 			model.addAttribute("problem", new ProblemEntity());
 			model.addAttribute("task", new TaskEntity());
 			model.addAttribute("problems", problemsService.findByReportId(reportId));
@@ -65,15 +70,17 @@ public class ReportController {
 		} catch (NullPointerException e) {
 			System.out.println("No such a report");
 			model.addAttribute("alert", "Wybierz poprawny raport lub utwórz nowy");
-			model.addAttribute("productIdAx", productId);
-			model.addAttribute("productName", productsService.getProductById(productId).getName());
+			model.addAttribute("productIdAx", productClient.checkId(String.valueOf(productId)));
+			//model.addAttribute("productName", productsService.getProductById(productId).getName());
+			model.addAttribute("productName", productName);
 			model.addAttribute("reports", reportsService.findByProductIdOrderByRevisionDesc(productId));
 			return new ModelAndView("page_revision");
 		}
 	}
 
-	@GetMapping(value = "/viewReportClient", params = "reportId")
+	/*@GetMapping(value = "/viewReportClient", params = "reportId")
 	public ModelAndView viewReportClient(@RequestParam(value = "reportId") long reportId, Model model) {
+		//String productName = productClient.getName(String.valueOf(productId));
 		ReportEntity report = reportsService.findOne(reportId);
 		model.addAttribute("productIdAx", report.getProduct().getId());
 		model.addAttribute("reportRev", report.getRevision());
@@ -86,14 +93,15 @@ public class ReportController {
 		model.addAttribute("conclusion", report.getConclusion());
 		model.addAttribute("report",reportsService.findOne(reportId));
 		return new ModelAndView("page_view_report_client");
-	}
+	}*/
 
 
 	@GetMapping(value = "/products", params = {"id"})
 	public ModelAndView getReportById(@RequestParam(value = "id") long id, Model model) {
 		try {
-			String productName = productsService.getProductById(id).getName();
-			model.addAttribute("productIdAx", id);
+			String productName = productClient.getName(String.valueOf(id));
+			//String productName = productsService.getProductById(id).getName();
+			model.addAttribute("productIdAx", productClient.checkId(String.valueOf(id)));
 			model.addAttribute("productName", productName);
 			model.addAttribute("reports", reportsService.findByProductIdOrderByRevisionDesc(id));
 			return new ModelAndView("page_revision");
@@ -107,8 +115,8 @@ public class ReportController {
 	@PostMapping(value = "/report", params = {"productId"})
 	@ResponseBody
 	public String createReport(@RequestParam(value = "productId") long productId, @RequestParam(value= "copyLast") boolean copyLast, Authentication authentication) {
-		ReportEntity newReport = new ReportEntity(reportsService.getNewRevision(productId), authentication.getPrincipal().toString().split(Pattern.quote("\\"))[1], "", new ArrayList<>(), "", "");
-		newReport.setProduct(productsService.getProductById(productId));
+		ReportEntity newReport = new ReportEntity(reportsService.getNewRevision(productId), authentication.getPrincipal().toString().split(Pattern.quote("\\"))[1], "", new ArrayList<>(), "", "",productId);
+		//newReport.setProduct(productsService.getProductById(productId));
 		reportsService.save(newReport,copyLast, productId);
 		return "/products?productId="+productId+"&reportId="+ newReport.getId();
 	}

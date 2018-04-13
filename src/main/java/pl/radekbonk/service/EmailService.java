@@ -22,7 +22,7 @@ public class EmailService {
 		SimpleMailMessage message = new SimpleMailMessage();
 		message.setFrom("powiadomienie@radekbonk.pl");
 		message.setTo("bonk.r@assel.pl");
-		message.setSubject("NPI - Zadanie do wykonania w produkcie: " + report.getProduct().getId());
+		message.setSubject("NPI - Zadanie do wykonania w produkcie: " + report.getProductId());
 		message.setText("Zadanie: " + task.getDescription() +
 				"\n" + "Wymagana data: " + task.getRequiredDate().getTime());
 		emailSender.send(message);

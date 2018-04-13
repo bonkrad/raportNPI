@@ -1,4 +1,4 @@
-package pl.radekbonk.service;
+/*package pl.radekbonk.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,4 +18,4 @@ public class ProductsService {
 	public ProductEntity getProductById(long id) {
 		return this.productRepository.findOne(id);
 	}
-}
+}*/

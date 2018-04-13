@@ -1,9 +1,9 @@
-/*package pl.radekbonk.configuration;
+package pl.radekbonk.configuration;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.oxm.jaxb.Jaxb2Marshaller;
-import pl.radekbonk.ProductClient;
+import pl.radekbonk.service.ProductClient;
 
 @Configuration
 public class ProductConfiguration {
@@ -25,4 +25,4 @@ public class ProductConfiguration {
 		client.setUnmarshaller(marshaller);
 		return client;
 	}
-}*/
+}

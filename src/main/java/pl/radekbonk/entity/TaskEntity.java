@@ -16,8 +16,8 @@ public class TaskEntity {
 	private String description;
 	@Lob
 	private String comment;
-	
-	private int responsibleWorker;
+
+	private String responsibleWorker;
 	
 	@Temporal(TemporalType.DATE)
 	private Calendar requiredDate;
@@ -38,7 +38,7 @@ public class TaskEntity {
 	}
 
 	
-	public TaskEntity(String description, String comment, int responsibleWorker, Calendar requiredDate, Calendar closedDate, String author, Boolean closed) {
+	public TaskEntity(String description, String comment, String responsibleWorker, Calendar requiredDate, Calendar closedDate, String author, Boolean closed) {
 		this.description = description;
 		this.comment = comment;
 		this.responsibleWorker = responsibleWorker;
@@ -73,11 +73,11 @@ public class TaskEntity {
 		this.comment = comment;
 	}
 	
-	public int getResponsibleWorker() {
+	public String getResponsibleWorker() {
 		return responsibleWorker;
 	}
 	
-	public void setResponsibleWorker(int responsibleWorker) {
+	public void setResponsibleWorker(String responsibleWorker) {
 		this.responsibleWorker = responsibleWorker;
 	}
 	

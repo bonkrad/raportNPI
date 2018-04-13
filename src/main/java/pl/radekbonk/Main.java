@@ -2,12 +2,8 @@ package pl.radekbonk;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.Bean;
-import pl.radekbonk.entity.ProductEntity;
-import pl.radekbonk.repository.ProductRepository;
 
 @SpringBootApplication
 public class Main {
@@ -21,7 +17,7 @@ public class Main {
 		//System.out.println(NTSystem.getName());
 	}
 
-	@Bean
+	/*@Bean
 	public CommandLineRunner productDemo(ProductRepository repository) {
 		return (args) -> {
 			repository.save(new ProductEntity(34526,"[ST] PCBA Base board"));
@@ -30,7 +26,7 @@ public class Main {
 			repository.save(new ProductEntity(20164,"[HU] STB 91-00438 DTR-T2100/500G/BT/DF"));
 
 		};
-	}
+	}*/
 
 	public static String getUploadPath() {
 		if(System.getProperty("os.name").contains("Windows")) {
@@ -45,17 +41,19 @@ public class Main {
 	/*@Bean
 	public CommandLineRunner lookup(ProductClient productClient) {
 		return (args) -> {
-			String id = "ZP-32580";
+			String id = "34760";
 
 			if (args.length > 0) {
 				id = args[0];
 			}
-			GetProdIdDetailsXmlResponse response = productClient.getProdIdDetailsXml(id);
-			JAXBElement<String> object = response.getGetProdIdDetailsXmlResult();
-			System.err.println(response.getGetProdIdDetailsXmlResult());
-			System.out.println(object.getDeclaredType());
+			GetItemIdDetailsJsonResponse response = productClient.getItemIdDetailsJson(id);
+			JAXBElement<String> object = response.getGetItemIdDetailsJsonResult();
+			//System.err.println(response.getGetItemIdDetailsJsonResult());
+			//System.out.println(object.getDeclaredType());
 			System.out.println(object.getValue());
-			System.out.println(object.getName());
+			//System.out.println(object.getName());
+			JSONObject jsonObject = new JSONObject(object.getValue().replace("[","").replace("]",""));
+			System.out.println(jsonObject.get("ITEMNAME"));
 		};
 	}*/
 
