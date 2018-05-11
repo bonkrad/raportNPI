@@ -191,15 +191,37 @@
     <div id="summaryBlock" th:value="@{/report(reportId=${reportId})}">
 
     </div>
-    <form th:action="@{/generateExcel(reportId=${reportId})}" method="post">
+
+    <!--<form th:action="@{/generateExcel(reportId=${reportId})}" method="post">
         <div class="row h-margin">
             <div class="col-sm">
                 <button class="btn btn-outline-secondary" th:value="@{/generateExcel(reportId=${reportId})}"
-                        type="submit">Generuj Raport w Excel
+                        type="submit">Generuj Raport Excel
+                </button>
+            </div>
+        </div>
+    </form>-->
+
+    <form th:action="@{/generateWord(reportId=${reportId},language='polish')}" method="post">
+        <div class="row h-margin">
+            <div class="col-sm">
+                <button class="btn btn-outline-secondary" th:value="@{/generateWord(reportId=${reportId})}"
+                        type="submit">Generuj Raport Word Polski
                 </button>
             </div>
         </div>
     </form>
+
+    <form th:action="@{/generateWord(reportId=${reportId},language='english')}" method="post">
+        <div class="row h-margin">
+            <div class="col-sm">
+                <button class="btn btn-outline-secondary" th:value="@{/generateWord(reportId=${reportId})}"
+                        type="submit">Generuj Raport Word Angielski
+                </button>
+            </div>
+        </div>
+    </form>
+
 </div>
 <div id="editFormBlock">
     <div class="container">

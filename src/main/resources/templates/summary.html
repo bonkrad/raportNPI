@@ -47,6 +47,42 @@
             </div>
         </div>
     </div>
+    <div class="row">
+        <div class="col-sm">
+            <div class="input-group">
+                <div class="input-group-prepend">
+                    <span class="input-group-text" id="basic-addon1">Inżynier Produktu</span>
+                </div>
+                <textarea class="form-control" th:value="@{/report(reportId=${reportId})}"
+                          placeholder="Inżynier Produktu" id="productEngineerTextArea"
+                          rows="1" th:text="${productEngineer}"></textarea>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm">
+            <div class="input-group">
+                <div class="input-group-prepend">
+                    <span class="input-group-text" id="basic-addon1">Inżynier Procesu</span>
+                </div>
+                <textarea class="form-control" th:value="@{/report(reportId=${reportId})}"
+                          placeholder="Inżynier Procesu" id="processEngineerTextArea"
+                          rows="1" th:text="${processEngineer}"></textarea>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm">
+            <div class="input-group">
+                <div class="input-group-prepend">
+                    <span class="input-group-text" id="basic-addon1">Inżynier Jakości</span>
+                </div>
+                <textarea class="form-control" th:value="@{/report(reportId=${reportId})}"
+                          placeholder="Inżynier Jakości" id="qualityEngineerTextArea"
+                          rows="1" th:text="${qualityEngineer}"></textarea>
+            </div>
+        </div>
+    </div>
 </div>
 </body>
 </html>

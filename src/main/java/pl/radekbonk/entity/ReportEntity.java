@@ -26,6 +26,9 @@ public class ReportEntity {
 
 	private String summary;
 	private String conclusion;
+	private String productEngineer;
+	private String processEngineer;
+	private String qualityEngineer;
 
 	/*@ManyToOne
 	private ProductEntity product;*/
@@ -36,7 +39,7 @@ public class ReportEntity {
 
 	}
 
-	public ReportEntity(BigDecimal revision, String author, String imgSrc, List<String> attachmentSrc, String summary, String conclusion, long productId) {
+	public ReportEntity(BigDecimal revision, String author, String imgSrc, List<String> attachmentSrc, String summary, String conclusion, long productId, String productEngineer, String processEngineer, String qualityEngineer) {
 		this.revision = revision;
 		this.author = author;
 		this.imgSrc = imgSrc;
@@ -45,6 +48,9 @@ public class ReportEntity {
 		this.conclusion = conclusion;
 		this.timestamp = Calendar.getInstance();
 		this.productId = productId;
+		this.productEngineer = productEngineer;
+		this.processEngineer = processEngineer;
+		this.qualityEngineer = qualityEngineer;
 	}
 
 	public long getId() {
@@ -117,5 +123,29 @@ public class ReportEntity {
 
 	public void setProductId(long productId) {
 		this.productId = productId;
+	}
+
+	public String getProductEngineer() {
+		return productEngineer;
+	}
+
+	public void setProductEngineer(String productEngineer) {
+		this.productEngineer = productEngineer;
+	}
+
+	public String getProcessEngineer() {
+		return processEngineer;
+	}
+
+	public void setProcessEngineer(String processEngineer) {
+		this.processEngineer = processEngineer;
+	}
+
+	public String getQualityEngineer() {
+		return qualityEngineer;
+	}
+
+	public void setQualityEngineer(String qualityEngineer) {
+		this.qualityEngineer = qualityEngineer;
 	}
 }

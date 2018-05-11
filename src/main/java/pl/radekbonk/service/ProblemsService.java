@@ -33,15 +33,15 @@ public class ProblemsService {
 		return problemRepository.findAll();
 	}
 
-	public Iterable<ProblemEntity> findByReportId(long id) {
+	public List<ProblemEntity> findByReportId(long id) {
 		return problemRepository.findByReportId(id);
 	}
 
-	public Iterable<ProblemEntity> findMajorByReportId(long id) {
+	public List<ProblemEntity> findMajorByReportId(long id) {
 		return problemRepository.findByReportIdAndPriorityGreaterThan(id, 3);
 	}
 
-	public Iterable<ProblemEntity> findMinorByReportId(long id) {
+	public List<ProblemEntity> findMinorByReportId(long id) {
 		return problemRepository.findByReportIdAndPriorityLessThan(id, 4);
 	}
 

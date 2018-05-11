@@ -224,6 +224,9 @@ $(document).ready(function() {
         var formData = new FormData();
         formData.append('summary', $('#economicalSummaryTextArea').val());
         formData.append('conclusion', $('#summaryTextArea').val());
+        formData.append('productEngineer', $('#productEngineerTextArea').val());
+        formData.append('processEngineer', $('#processEngineerTextArea').val());
+        formData.append('qualityEngineer', $('#qualityEngineerTextArea').val());
 //        formData.append('_csrf', $("input[name='_csrf']").val());
         var input = document.querySelector('#economicalSummaryFileInput');
         var curFiles = input.files;
@@ -270,6 +273,18 @@ $(document).ready(function() {
     });
 
     $('#summaryBlock').on('click', '.btnSaveSummaryAttachment', function() {
+        saveSummary();
+    });
+
+    $('#summaryBlock').on('blur', '#productEngineerTextArea', function() {
+        saveSummary();
+    });
+
+    $('#summaryBlock').on('blur', '#processEngineerTextArea', function() {
+        saveSummary();
+    });
+
+    $('#summaryBlock').on('blur', '#qualityEngineerTextArea', function() {
         saveSummary();
     });
 

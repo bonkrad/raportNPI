@@ -1,5 +1,6 @@
 package pl.radekbonk.controller;
 
+import org.apache.poi.util.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
@@ -65,7 +66,7 @@ public class ReportController {
 			model.addAttribute("tasks", tasksService.findByReportId(reportId));
 			model.addAttribute("summary", report.getSummary());
 			model.addAttribute("conclusion", report.getConclusion());
-			model.addAttribute("report",reportsService.findOne(reportId));
+			model.addAttribute("report", reportsService.findOne(reportId));
 			return new ModelAndView("page_view_report");
 		} catch (NullPointerException e) {
 			System.out.println("No such a report");
@@ -105,55 +106,78 @@ public class ReportController {
 			model.addAttribute("productName", productName);
 			model.addAttribute("reports", reportsService.findByProductIdOrderByRevisionDesc(id));
 			return new ModelAndView("page_revision");
-		} catch(NullPointerException e) {
+		} catch (NullPointerException e) {
 			System.out.println("No such an ID");
-			model.addAttribute("alert","Nie ma takiego ID");
+			model.addAttribute("alert", "Nie ma takiego ID");
 			return new ModelAndView("page_product");
 		}
 	}
 
 	@PostMapping(value = "/report", params = {"productId"})
 	@ResponseBody
-	public String createReport(@RequestParam(value = "productId") long productId, @RequestParam(value= "copyLast") boolean copyLast, Authentication authentication) {
-		ReportEntity newReport = new ReportEntity(reportsService.getNewRevision(productId), authentication.getPrincipal().toString().split(Pattern.quote("\\"))[1], "", new ArrayList<>(), "", "",productId);
+	public String createReport(@RequestParam(value = "productId") long productId, @RequestParam(value = "copyLast") boolean copyLast, Authentication authentication) {
+		ReportEntity newReport = new ReportEntity(reportsService.getNewRevision(productId), authentication.getPrincipal().toString().split(Pattern.quote("\\"))[1], "", new ArrayList<>(), "", "", productId,"","","");
 		//newReport.setProduct(productsService.getProductById(productId));
-		reportsService.save(newReport,copyLast, productId);
-		return "/products?productId="+productId+"&reportId="+ newReport.getId();
+		reportsService.save(newReport, copyLast, productId);
+		return "/products?productId=" + productId + "&reportId=" + newReport.getId();
 	}
 
 
-	@GetMapping(value="/report", params= {"reportId"})
+	@GetMapping(value = "/report", params = {"reportId"})
 	public String viewReport(@RequestParam(value = "reportId") long reportId, Model model) {
 		ReportEntity report = reportsService.findOne(reportId);
 		model.addAttribute("summary", report.getSummary());
 		model.addAttribute("conclusion", report.getConclusion());
+		model.addAttribute("productEngineer", report.getProductEngineer());
+		model.addAttribute("processEngineer", report.getProcessEngineer());
+		model.addAttribute("qualityEngineer", report.getQualityEngineer());
 		model.addAttribute("reportId", reportId);
 		model.addAttribute("report", report);
 		return "summary :: summaryFragment";
 	}
 
-	@PostMapping(value="/report", params= {"reportId"})
-	public ModelAndView saveReport(@RequestParam(value = "reportId") long reportId, @RequestParam(value = "summary") String summary, @RequestParam(value = "conclusion") String conclusion, @RequestParam(value = "attachment[]", required = false) MultipartFile[] attachments,@RequestParam(value = "attachmentsToDelete[]", required = false) String[] attachmentsToDelete) {
+	@PostMapping(value = "/report", params = {"reportId"})
+	public ModelAndView saveReport(@RequestParam(value = "reportId") long reportId, @RequestParam(value = "summary") String summary, @RequestParam(value = "conclusion") String conclusion, @RequestParam(value = "productEngineer") String productEngineer, @RequestParam(value = "processEngineer") String processEngineer, @RequestParam(value = "qualityEngineer") String qualityEngineer, @RequestParam(value = "attachment[]", required = false) MultipartFile[] attachments, @RequestParam(value = "attachmentsToDelete[]", required = false) String[] attachmentsToDelete) {
 		ReportEntity reportEntity = reportsService.findOne(reportId);
 		reportEntity.setSummary(summary);
 		reportEntity.setConclusion(conclusion);
-		reportsService.save(reportEntity,attachments,attachmentsToDelete);
+		reportEntity.setProductEngineer(productEngineer);
+		reportEntity.setProcessEngineer(processEngineer);
+		reportEntity.setQualityEngineer(qualityEngineer);
+		reportsService.save(reportEntity, attachments, attachmentsToDelete);
 		return new ModelAndView("redirect:/report?reportId=" + reportId);
 	}
 
-	@PostMapping(value = "generateExcel",params = "reportId")
-	public void getFile(
+	@PostMapping(value = "generateExcel", params = "reportId")
+	public void getExcel(
 			@RequestParam("reportId") long reportId,
 			HttpServletResponse response) {
 		String fileName = reportsService.getReportNameZip(reportId);
 		try {
 			InputStream is = new FileInputStream(reportsService.generateExcel(reportId));
 			response.setContentType("application/zip");
-			response.setHeader("Content-Disposition", "attachment; filename="+fileName);
+			response.setHeader("Content-Disposition", "attachment; filename=" + fileName);
 			org.apache.poi.util.IOUtils.copy(is, response.getOutputStream());
 			response.flushBuffer();
 		} catch (IOException ex) {
-			throw new RuntimeException("IOError writing file to output stream");
+			//throw new RuntimeException("IOError writing file to output stream");
+			ex.printStackTrace();
+		}
+	}
+
+	@PostMapping(value = "generateWord", params = {"reportId","language"})
+	public void getWordPolish(@RequestParam("reportId") long reportId,@RequestParam("language") String language, HttpServletResponse response) {
+		String fileName = reportsService.getReportNameZip(reportId);
+		System.out.println(language);
+		try {
+			InputStream is = new FileInputStream(reportsService.generateWord(reportId,language));
+			response.setContentType("application/zip");
+			response.setHeader("Content-Disposition", "attachment; filename=" + fileName);
+			IOUtils.copy(is, response.getOutputStream());
+			response.flushBuffer();
+		} catch (Exception ex) {
+//			throw new RuntimeException("IOError writing file to output stream");
+			ex.printStackTrace();
 		}
 	}
 

@@ -5,14 +5,16 @@ import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.ss.util.RegionUtil;
 import org.apache.poi.util.IOUtils;
+import org.apache.poi.util.Units;
 import org.apache.poi.xssf.usermodel.XSSFPrintSetup;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.poi.xwpf.usermodel.*;
+import org.openxmlformats.schemas.wordprocessingml.x2006.main.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import pl.radekbonk.Main;
-import pl.radekbonk.entity.ProblemEntity;
-import pl.radekbonk.entity.ReportEntity;
+import pl.radekbonk.entity.*;
 import pl.radekbonk.repository.ReportRepository;
 
 import javax.imageio.ImageIO;
@@ -29,7 +31,6 @@ import java.util.zip.ZipOutputStream;
 
 @Service
 public class ReportsService {
-
 	@Autowired
 	private ReportRepository reportRepository;
 
@@ -52,7 +53,7 @@ public class ReportsService {
 		return reportRepository.findAll();
 	}
 
-	public Iterable<ReportEntity> findByProductId(long productId) {
+	public List<ReportEntity> findByProductId(long productId) {
 		return reportRepository.findByProductId(productId);
 	}
 
@@ -190,7 +191,7 @@ public class ReportsService {
 		//String productName = productsService.getProductById(productId).getName();
 		String productName = productClient.getName(String.valueOf(productId));
 
-		String fileName = getReportName(reportId);
+		String fileName = getReportNameExcel(reportId);
 
 		Workbook workbook = new XSSFWorkbook();
 
@@ -371,7 +372,7 @@ public class ReportsService {
 		sheet.addMergedRegion(cellRangeAddress);
 		setBorderThin(cellRangeAddress, sheet);
 
-		Iterable<ProblemEntity> majorProblems = problemsService.findMajorByReportId(reportId);
+		List<ProblemEntity> majorProblems = problemsService.findMajorByReportId(reportId);
 		rowNum = createProblemsTable(majorProblems, workbook, sheet, rowNum, borderThin, productId, borderThinRed, wrapText);
 
 		rowNum++;
@@ -383,7 +384,7 @@ public class ReportsService {
 		sheet.addMergedRegion(cellRangeAddress);
 		setBorderThin(cellRangeAddress, sheet);
 
-		Iterable<ProblemEntity> minorProblems = problemsService.findMinorByReportId(reportId);
+		List<ProblemEntity> minorProblems = problemsService.findMinorByReportId(reportId);
 		rowNum = createProblemsTable(minorProblems, workbook, sheet, rowNum, borderThin, productId, borderThinRed, wrapText);
 
 		rowNum += 2;
@@ -422,7 +423,7 @@ public class ReportsService {
 		row = sheet.createRow((short) rowNum);
 		row.createCell(0).setCellValue(report.getConclusion());
 
-		workbook.setPrintArea(0,0,9,0,rowNum);
+		workbook.setPrintArea(0, 0, 9, 0, rowNum);
 
 		sheet.getPrintSetup().setPaperSize(XSSFPrintSetup.A4_PAPERSIZE);
 		sheet.getPrintSetup().setLandscape(true);
@@ -459,7 +460,7 @@ public class ReportsService {
 		return realPathToUploads + getReportNameZip(reportId);
 	}
 
-	private int createProblemsTable(Iterable<ProblemEntity> problems, Workbook workbook, Sheet sheet, int rowNum, CellStyle borderThin, long productId, CellStyle borderThinRed, CellStyle wrapText) {
+	private int createProblemsTable(List<ProblemEntity> problems, Workbook workbook, Sheet sheet, int rowNum, CellStyle borderThin, long productId, CellStyle borderThinRed, CellStyle wrapText) {
 
 		rowNum++;
 		Row row = sheet.createRow((short) rowNum);
@@ -581,20 +582,541 @@ public class ReportsService {
 				Hyperlink link = helper.createHyperlink(HyperlinkType.FILE);
 				link.setAddress(problem.getAttachmentSrc().replace("/disk/" + productId + "/", ""));
 				cell.setHyperlink(link);
-				srcFiles.add(Main.getUploadPath().replace("disk/", "") + problem.getAttachmentSrc());
+				if (!problem.getAttachmentSrc().equals("")) {
+					srcFiles.add(Main.getUploadPath().replace("disk/", "") + problem.getAttachmentSrc());
+				}
 			}
 		}
 		return rowNum;
 	}
 
+	public String generateWord(long reportId, String language) throws Exception {
+		WordDictionary dictionary;
+		if (language.equals("polish")) {
+			dictionary = new PolishWordDictionary();
+		} else {
+			dictionary = new EnglishWordDictionary();
+		}
+		ClassLoader classLoader = getClass().getClassLoader();
+		InputStream inputStream = classLoader.getResourceAsStream("document.docx");
+		try (XWPFDocument document = new XWPFDocument(inputStream)) {
 
-	private String getReportName(long reportId) {
+			i = 0;
+			srcFiles.clear();
+			long productId = findOne(reportId).getProductId();
+			String realPathToUploads = Main.getUploadPath() + productId + "/";
+			if (!new File(realPathToUploads).exists()) {
+				new File(realPathToUploads).mkdir();
+			}
+
+			FileOutputStream fos = new FileOutputStream(realPathToUploads + getReportNameZip(reportId));
+			ZipOutputStream zipOut = new ZipOutputStream(fos);
+			ReportEntity report = findOne(reportId);
+
+			String productName = productClient.getName(String.valueOf(productId));
+
+			String fileName = getReportNameWord(reportId);
+
+			XWPFParagraph paragraph = document.createParagraph();
+			XWPFRun r = paragraph.createRun();
+
+			paragraph = document.createParagraph();
+			r = paragraph.createRun();
+			r.setText(dictionary.getRaportNPI());
+			r.setBold(true);
+			r.setFontSize(36);
+			paragraph.setAlignment(ParagraphAlignment.CENTER);
+
+			XWPFTable reportTable = document.createTable(4, 2);
+			paragraph = reportTable.getRow(0).getCell(0).getParagraphArray(0);
+			paragraph.setAlignment(ParagraphAlignment.CENTER);
+			r = paragraph.createRun();
+			r.setText(dictionary.getProductName());
+			r.setBold(true);
+			r.setFontSize(14);
+
+			paragraph = reportTable.getRow(0).getCell(1).getParagraphArray(0);
+			paragraph.setAlignment(ParagraphAlignment.CENTER);
+			r = paragraph.createRun();
+			r.setText(productId + " " + productName);
+			r.setFontSize(14);
+
+			paragraph = reportTable.getRow(1).getCell(0).getParagraphArray(0);
+			paragraph.setAlignment(ParagraphAlignment.CENTER);
+			r = paragraph.createRun();
+			r.setText(dictionary.getProcessEngineer());
+			r.setBold(true);
+			r.setFontSize(14);
+
+			paragraph = reportTable.getRow(1).getCell(1).getParagraphArray(0);
+			paragraph.setAlignment(ParagraphAlignment.CENTER);
+			r = paragraph.createRun();
+			r.setText(report.getProcessEngineer());
+			r.setFontSize(14);
+
+			paragraph = reportTable.getRow(2).getCell(0).getParagraphArray(0);
+			paragraph.setAlignment(ParagraphAlignment.CENTER);
+			r = paragraph.createRun();
+			r.setText(dictionary.getProductEngineer());
+			r.setBold(true);
+			r.setFontSize(14);
+
+			paragraph = reportTable.getRow(2).getCell(1).getParagraphArray(0);
+			paragraph.setAlignment(ParagraphAlignment.CENTER);
+			r = paragraph.createRun();
+			r.setText(report.getProductEngineer());
+			r.setFontSize(14);
+
+			paragraph = reportTable.getRow(3).getCell(0).getParagraphArray(0);
+			paragraph.setAlignment(ParagraphAlignment.CENTER);
+			r = paragraph.createRun();
+			r.setText(dictionary.getQualityEngineer());
+			r.setBold(true);
+			r.setFontSize(14);
+
+			paragraph = reportTable.getRow(3).getCell(1).getParagraphArray(0);
+			paragraph.setAlignment(ParagraphAlignment.CENTER);
+			r = paragraph.createRun();
+			r.setText(report.getQualityEngineer());
+			r.setFontSize(14);
+
+			setTableAlign(reportTable, ParagraphAlignment.CENTER);
+
+
+			paragraph = document.createParagraph();
+			r = paragraph.createRun();
+			r.addCarriageReturn();
+			r.addCarriageReturn();
+			r.setText(dictionary.getRevisionHistory());
+			r.setBold(true);
+			r.setFontSize(13);
+			paragraph.setAlignment(ParagraphAlignment.CENTER);
+
+			XWPFTable revisionTable = document.createTable();
+			XWPFTableRow row = revisionTable.getRow(0);
+			paragraph = row.getCell(0).getParagraphArray(0);
+			r = paragraph.createRun();
+			r.setText(dictionary.getRevision());
+			r.setBold(true);
+
+			paragraph = row.addNewTableCell().getParagraphArray(0);
+			r = paragraph.createRun();
+			r.setText(dictionary.getChange());
+			r.setBold(true);
+
+			paragraph = row.addNewTableCell().getParagraphArray(0);
+			r = paragraph.createRun();
+			r.setText(dictionary.getDate());
+			r.setBold(true);
+
+			List<ReportEntity> reports = reportRepository.findByProductIdOrderByRevisionAsc(productId);
+			for (int i = 0; i < reports.size(); i++) {
+				row = revisionTable.createRow();
+				paragraph = row.getCell(0).getParagraphArray(0);
+				r = paragraph.createRun();
+				r.setText(String.valueOf(reports.get(i).getRevision()));
+
+				paragraph = row.getCell(1).getParagraphArray(0);
+				r = paragraph.createRun();
+				r.setText("");
+
+				paragraph = row.getCell(2).getParagraphArray(0);
+				r = paragraph.createRun();
+				r.setText(String.valueOf(reports.get(i).getTimestamp().getTime()));
+			}
+
+			setTableAlign(revisionTable, ParagraphAlignment.CENTER);
+
+			try (FileOutputStream outputStream = new FileOutputStream(realPathToUploads + fileName)) {
+				document.write(outputStream);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+
+			paragraph = document.createParagraph();
+			paragraph.setPageBreak(true);
+			r = paragraph.createRun();
+			r.setText("1. " + dictionary.getIntroduction());
+			r.setBold(true);
+			r.setFontSize(16);
+
+			paragraph = document.createParagraph();
+			r = paragraph.createRun();
+			r.setText("Krótki opis produktu oraz przebiegu wdrożenia – wyszczególnienie procesów, jakie miały miejsce, każdy proces po 2-3 zdania opisu");
+
+			paragraph = document.createParagraph();
+			r = paragraph.createRun();
+			r.setText("2. " + dictionary.getFoundProblems());
+			r.setFontSize(16);
+			r.setBold(true);
+			//r = paragraph.createRun();
+
+			paragraph = document.createParagraph();
+			paragraph.setAlignment(ParagraphAlignment.CENTER);
+			r = paragraph.createRun();
+			r.setText(dictionary.getCriticals());
+			r.setFontSize(16);
+			r.setBold(true);
+			//r = paragraph.createRun();
+
+			List<ProblemEntity> majorProblems = problemsService.findMajorByReportId(reportId);
+			/*int nCols = 10;
+			int nRows = majorProblems.size();*/
+			fillTable(document, majorProblems, productId, dictionary);
+
+			paragraph = document.createParagraph();
+			paragraph.setAlignment(ParagraphAlignment.CENTER);
+			r = paragraph.createRun();
+			r.addCarriageReturn();
+			r.setText(dictionary.getOtherObservations());
+			r.setFontSize(16);
+			r.setBold(true);
+
+			List<ProblemEntity> minorProblems = problemsService.findMinorByReportId(reportId);
+			/*nCols = 10;
+			nRows = minorProblems.size();*/
+			fillTable(document, minorProblems, productId, dictionary);
+
+			paragraph = document.createParagraph();
+			r = paragraph.createRun();
+			r.addCarriageReturn();
+			r.setText("3. " + dictionary.getDetailedDescription());
+			r.setFontSize(16);
+			r.setBold(true);
+
+			paragraph = document.createParagraph();
+			r = paragraph.createRun();
+			r.setText("W przypadku potrzeby rozszerzenia opisu, dodania większych zdjęć do konkretnych problemów z pkt. 2");
+
+			paragraph = document.createParagraph();
+			r = paragraph.createRun();
+			r.addCarriageReturn();
+			r.setText("4. " + dictionary.getEconomicalSummary());
+			r.setFontSize(16);
+			r.setBold(true);
+
+			paragraph = document.createParagraph();
+			r = paragraph.createRun();
+			r.setText(report.getSummary());
+
+			paragraph = document.createParagraph();
+			r = paragraph.createRun();
+			r.addCarriageReturn();
+			r.setText("5. " + dictionary.getConclusion());
+			r.setFontSize(16);
+			r.setBold(true);
+
+			paragraph = document.createParagraph();
+			r = paragraph.createRun();
+			r.setText(report.getConclusion());
+
+			paragraph = document.createParagraph();
+			r = paragraph.createRun();
+			r.addCarriageReturn();
+			r.setText("6. " + dictionary.getAttachments());
+			r.setFontSize(16);
+			r.setBold(true);
+
+			int k = 1;
+			for (String reportAttachmentSrc : report.getAttachmentSrc()) {
+				if (!reportAttachmentSrc.equals("")) {
+					srcFiles.add(Main.getUploadPath().replace("disk/", "") + reportAttachmentSrc);
+
+					paragraph = document.createParagraph();
+					String id = paragraph.getDocument().getPackagePart().addExternalRelationship(reportAttachmentSrc.replace("/disk/" + productId + "/", ""), XWPFRelation.HYPERLINK.getRelation()).getId();
+
+					CTHyperlink cLink = paragraph.getCTP().addNewHyperlink();
+					cLink.setId(id);
+
+					CTText ctText = CTText.Factory.newInstance();
+					ctText.setStringValue(dictionary.getAttachment() + " " + k);
+					CTR ctr = CTR.Factory.newInstance();
+					ctr.setTArray(new CTText[]{ctText});
+					cLink.setRArray(new CTR[]{ctr});
+					k++;
+				}
+			}
+			/*CTSectPr sectPr = document.getDocument().getBody().addNewSectPr();
+			XWPFHeaderFooterPolicy policy = new XWPFHeaderFooterPolicy(document, sectPr);
+
+			CTP ctpHeader = CTP.Factory.newInstance();
+			//CTR ctrHeader = ctpHeader.addNewR();
+			//CTText ctHeader = ctrHeader.addNewT();
+			SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd-MM-yyyy");
+			Date now = new Date();
+			String strDate = simpleDateFormat.format(now);
+			String headerText = "Pruszcz Gdański, " + strDate;
+			//ctHeader.setStringValue(headerText);
+
+			try {
+				XWPFParagraph headerParagraph = new XWPFParagraph(ctpHeader, document);
+				XWPFParagraph[] parsHeader = new XWPFParagraph[1];
+				headerParagraph.setAlignment(ParagraphAlignment.LEFT);
+				XWPFRun run = headerParagraph.createRun();
+				InputStream is = classLoader.getResourceAsStream("assel.jpg");
+				run.addPicture(is, XWPFDocument.PICTURE_TYPE_JPEG, "assel.jpg", Units.toEMU(200), Units.toEMU(50));
+				is.close();
+				run.addTab();
+				run.addTab();
+				run.addTab();
+				run.addTab();
+				run.addTab();
+				run.addTab();
+				run.addTab();
+				run.addTab();
+				run.addTab();
+				run.addTab();
+				run.addTab();
+				run.setText(headerText);
+				//headerParagraph.removeRun(0);
+				parsHeader[0] = headerParagraph;
+				XWPFHeader header = policy.createHeader(XWPFHeaderFooterPolicy.DEFAULT, parsHeader);
+				System.out.println(header.getText());
+				//policy.getHeader(XWPFHeaderFooterPolicy.DEFAULT);
+			} catch (NullPointerException e) {
+				e.printStackTrace();
+			}
+
+			CTP ctpFooter = CTP.Factory.newInstance();
+			CTR ctrFooter = ctpFooter.addNewR();
+			CTText ctFooter = ctrFooter.addNewT();
+			String footerText = "Revision " + report.getRevision();
+			ctFooter.setStringValue(footerText);
+			XWPFParagraph footerParagraph = new XWPFParagraph(ctpFooter, document);
+			XWPFParagraph[] parsFooter = new XWPFParagraph[1];
+			parsFooter[0] = footerParagraph;
+			policy.createFooter(XWPFHeaderFooterPolicy.DEFAULT, parsFooter);*/
+
+			try (FileOutputStream outputStream = new FileOutputStream(realPathToUploads + fileName)) {
+				document.write(outputStream);
+				document.close();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+
+			srcFiles.add(realPathToUploads + fileName);
+			for (String srcFile : srcFiles) {
+				File fileToZip = new File(srcFile);
+				FileInputStream fis = new FileInputStream(fileToZip);
+				ZipEntry zipEntry = new ZipEntry(fileToZip.getName());
+				zipOut.putNextEntry(zipEntry);
+
+				byte[] bytes = new byte[1024];
+				int length;
+				while ((length = fis.read(bytes)) >= 0) {
+					zipOut.write(bytes, 0, length);
+				}
+				fis.close();
+			}
+			zipOut.close();
+			fos.close();
+
+			return realPathToUploads + getReportNameZip(reportId);
+		}
+	}
+
+	public void setTableAlign(XWPFTable table, ParagraphAlignment align) {
+		CTTblPr tblPr = table.getCTTbl().getTblPr();
+		CTJc jc = (tblPr.isSetJc() ? tblPr.getJc() : tblPr.addNewJc());
+		STJc.Enum en = STJc.Enum.forInt(align.getValue());
+		jc.setVal(en);
+	}
+
+	private void fillTable(XWPFDocument document, List<ProblemEntity> problems, long productId, WordDictionary dictionary) {
+		XWPFTable table = document.createTable();
+		XWPFTableRow row = table.getRow(0);
+
+		/*r.setText("#");
+		r.setBold(true);*/
+
+		XWPFParagraph paragraph = row.getCell(0).getParagraphArray(0);
+		XWPFRun r = paragraph.createRun();
+		r = paragraph.createRun();
+		r.setText(dictionary.getPriority());
+		r.setFontSize(10);
+		r.setBold(true);
+
+		paragraph = row.addNewTableCell().getParagraphArray(0);
+		r = paragraph.createRun();
+		r.setText(dictionary.getCategory());
+		r.setFontSize(10);
+		r.setBold(true);
+
+		paragraph = row.addNewTableCell().getParagraphArray(0);
+		r = paragraph.createRun();
+		r.setText(dictionary.getDescription());
+		r.setFontSize(10);
+		r.setBold(true);
+
+		paragraph = row.addNewTableCell().getParagraphArray(0);
+		r = paragraph.createRun();
+		r.setText("");
+		r.setFontSize(10);
+		r.setBold(true);
+
+		paragraph = row.addNewTableCell().getParagraphArray(0);
+		r = paragraph.createRun();
+		r.setText(dictionary.getPhoto());
+		r.setFontSize(10);
+		r.setBold(true);
+
+		paragraph = row.addNewTableCell().getParagraphArray(0);
+		r = paragraph.createRun();
+		r.setText(dictionary.getReccommendations());
+		r.setFontSize(10);
+		r.setBold(true);
+
+		paragraph = row.addNewTableCell().getParagraphArray(0);
+		r = paragraph.createRun();
+		r.setText(dictionary.getStatus());
+		r.setFontSize(10);
+		r.setBold(true);
+
+		paragraph = row.addNewTableCell().getParagraphArray(0);
+		r = paragraph.createRun();
+		r.setText(dictionary.getAnswer());
+		r.setFontSize(10);
+		r.setBold(true);
+
+		paragraph = row.addNewTableCell().getParagraphArray(0);
+		r = paragraph.createRun();
+		r.setText("");
+		r.setFontSize(10);
+		r.setBold(true);
+
+		String pathToImages = Main.getUploadPath().replace("/disk/", "/");
+		ClassLoader classLoader = getClass().getClassLoader();
+		for (int i = 0; i < problems.size(); i++) {
+			XWPFTableRow problemRow = table.createRow();
+			//problemRow.getCell(0).setText(String.valueOf((i + 1)));
+			//problemRow.getCell(0).setText(String.valueOf(problems.get(i).getPriority()));
+			paragraph = problemRow.getCell(0).getParagraphArray(0);
+			r = paragraph.createRun();
+			r.setText(String.valueOf(problems.get(i).getPriority()));
+			r.setFontSize(9);
+			//problemRow.getCell(1).setText(problems.get(i).getCategory());
+			paragraph = problemRow.getCell(1).getParagraphArray(0);
+			r = paragraph.createRun();
+			r.setText(problems.get(i).getCategory());
+			r.setFontSize(9);
+//			problemRow.getCell(2).setText(problems.get(i).getDescription());
+			paragraph = problemRow.getCell(2).getParagraphArray(0);
+			r = paragraph.createRun();
+			r.setText(problems.get(i).getDescription());
+			r.setFontSize(9);
+			XWPFParagraph warningPara = problemRow.getCell(3).getParagraphArray(0);
+			try {
+				r = warningPara.createRun();
+				InputStream inputStream;
+				switch (problems.get(i).getWarning()) {
+					case 0:
+						break;
+					case 1:
+						inputStream = classLoader.getResourceAsStream("ctqExcel.png");
+						r.addPicture(inputStream, XWPFDocument.PICTURE_TYPE_PNG, "name", Units.toEMU(30), Units.toEMU(30));
+						inputStream.close();
+						break;
+					case 2:
+						inputStream = classLoader.getResourceAsStream("otdExcel.png");
+						r.addPicture(inputStream, XWPFDocument.PICTURE_TYPE_PNG, "name", Units.toEMU(30), Units.toEMU(30));
+						inputStream.close();
+						break;
+					case 3:
+						inputStream = classLoader.getResourceAsStream("ctqOtdExcel.png");
+						r.addPicture(inputStream, XWPFDocument.PICTURE_TYPE_PNG, "name", Units.toEMU(30), Units.toEMU(60));
+						inputStream.close();
+						break;
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+//			problemRow.getCell(4).setText("");
+
+			for (String imgSrc : problems.get(i).getImgSrc()) {
+				XWPFParagraph imgPara = problemRow.getCell(4).getParagraphArray(0);
+				if (!imgSrc.equals("")) {
+					try {
+						r = imgPara.createRun();
+						//r.setText("Tutaj zdjęcie");
+						FileInputStream fis = new FileInputStream(pathToImages + imgSrc);
+						BufferedImage img = ImageIO.read(fis);
+						int height = img.getHeight();
+						int width = img.getWidth();
+						double ratio = (double) height / width;
+						ByteArrayOutputStream os = new ByteArrayOutputStream();
+						ImageIO.write(img, "jpg", os);
+						InputStream is = new ByteArrayInputStream(os.toByteArray());
+						if (imgSrc.contains(".jpeg") || imgSrc.contains(".jpg")) {
+							r.addPicture(is, XWPFDocument.PICTURE_TYPE_JPEG, "name.jpeg", Units.toEMU(200), Units.toEMU(Math.round(ratio * 200)));
+							r.addCarriageReturn();
+						} else if (imgSrc.contains(".png")) {
+							r.addPicture(is, XWPFDocument.PICTURE_TYPE_PNG, "name.png", Units.toEMU(200), Units.toEMU(Math.round(ratio * 200)));
+							r.addCarriageReturn();
+						}
+						is.close();
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			}
+			/*problemRow.getCell(5).setText("Zdjęcia");*/
+//			problemRow.getCell(5).setText(problems.get(i).getRecommendation());
+			paragraph = problemRow.getCell(5).getParagraphArray(0);
+			r = paragraph.createRun();
+			r.setText(problems.get(i).getRecommendation());
+			r.setFontSize(9);
+//			problemRow.getCell(6).setText(problems.get(i).getStatus());
+			paragraph = problemRow.getCell(6).getParagraphArray(0);
+			r = paragraph.createRun();
+			r.setText(problems.get(i).getStatus());
+			r.setFontSize(9);
+//			problemRow.getCell(7).setText(problems.get(i).getAnswer());
+			paragraph = problemRow.getCell(7).getParagraphArray(0);
+			r = paragraph.createRun();
+			r.setText(problems.get(i).getAnswer());
+			r.setFontSize(9);
+//			problemRow.getCell(8).setText("");
+
+			String src = problems.get(i).getAttachmentSrc();
+			if (!src.equals("")) {
+
+				srcFiles.add(Main.getUploadPath().replace("disk/", "") + src);
+				paragraph = problemRow.getCell(8).getParagraphArray(0);
+				r = paragraph.createRun();
+				r.setFontSize(9);
+
+				String id = paragraph.getDocument().getPackagePart().addExternalRelationship(src.replace("/disk/" + productId + "/", ""), XWPFRelation.HYPERLINK.getRelation()).getId();
+
+				CTHyperlink cLink = paragraph.getCTP().addNewHyperlink();
+				cLink.setId(id);
+
+				CTText ctText = CTText.Factory.newInstance();
+				ctText.setStringValue(dictionary.getAtt());
+				CTR ctr = CTR.Factory.newInstance();
+				ctr.setTArray(new CTText[]{ctText});
+				cLink.setRArray(new CTR[]{ctr});
+
+			}
+		}
+
+	}
+
+	private String getReportNameExcel(long reportId) {
 		ReportEntity report = findOne(reportId);
 		long productId = report.getProductId();
 		BigDecimal reportRev = report.getRevision();
 		//String productName = productsService.getProductById(productId).getName();
 
 		return productId + "-rev." + reportRev + ".xlsx";
+	}
+
+	private String getReportNameWord(long reportId) {
+		ReportEntity report = findOne(reportId);
+		long productId = report.getProductId();
+		BigDecimal reportRev = report.getRevision();
+		//String productName = productsService.getProductById(productId).getName();
+
+		return productId + "-rev." + reportRev + ".docx";
 	}
 
 	public String getReportNameZip(long reportId) {
