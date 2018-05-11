@@ -1,32 +1,32 @@
 package pl.radekbonk.entity;
 
 public class WordDictionary {
-	private String raportNPI; //Raport NPI
-	private String productName; //Nazwa Produktu
-	private String processEngineer; //Inżynier Procesu
-	private String productEngineer; //Inżynier Produktu
-	private String qualityEngineer; //Inżynier Jakości
-	private String revisionHistory; //Historia Rewizji
-	private String revision; //Rewizja
-	private String change; //Zmiana
-	private String date; //Data
-	private String introduction; //Wstęp
-	private String foundProblems; //Zanlezione problemy, wątpliwości
-	private String criticals; //Krytyczne -wymagane zamkniecie przed kolejną produkcją
-	private String otherObservations; //Pozostałe obserwacje
-	private String detailedDescription; //Szczegółowy opis problemów, wątpliwości
-	private String economicalSummary; //Podsumowanie ekonomiczne
-	private String conclusion; //Wnioski z NPI, okreslenie statusu wdrożenia
-	private String attachments; //Załączniki do raportu
-	private String attachment; //Załącznik
-	private String priority; //Priorytet
-	private String category; //Kategoria
-	private String description; //Opis
-	private String photo; //Zdjęcie
-	private String reccommendations; //Zalecenie/Akcje Assel
-	private String status; //Status
-	private String answer; //Odpowiedź klienta
-	private String att; //Zał.
+	protected String raportNPI; //Raport NPI
+	protected String productName; //Nazwa Produktu
+	protected String processEngineer; //Inżynier Procesu
+	protected String productEngineer; //Inżynier Produktu
+	protected String qualityEngineer; //Inżynier Jakości
+	protected String revisionHistory; //Historia Rewizji
+	protected String revision; //Rewizja
+	protected String change; //Zmiana
+	protected String date; //Data
+	protected String introduction; //Wstęp
+	protected String foundProblems; //Zanlezione problemy, wątpliwości
+	protected String criticals; //Krytyczne -wymagane zamkniecie przed kolejną produkcją
+	protected String otherObservations; //Pozostałe obserwacje
+	protected String detailedDescription; //Szczegółowy opis problemów, wątpliwości
+	protected String economicalSummary; //Podsumowanie ekonomiczne
+	protected String conclusion; //Wnioski z NPI, okreslenie statusu wdrożenia
+	protected String attachments; //Załączniki do raportu
+	protected String attachment; //Załącznik
+	protected String priority; //Priorytet
+	protected String category; //Kategoria
+	protected String description; //Opis
+	protected String photo; //Zdjęcie
+	protected String reccommendations; //Zalecenie/Akcje Assel
+	protected String status; //Status
+	protected String answer; //Odpowiedź klienta
+	protected String att; //Zał.
 
 	public String getRaportNPI() {
 		return raportNPI;
