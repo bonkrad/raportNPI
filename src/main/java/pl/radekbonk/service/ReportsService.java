@@ -742,7 +742,11 @@ public class ReportsService {
 
 			paragraph = document.createParagraph();
 			r = paragraph.createRun();
-			r.setText("Krótki opis produktu oraz przebiegu wdrożenia – wyszczególnienie procesów, jakie miały miejsce, każdy proces po 2-3 zdania opisu");
+			if (report.getIntroduction().equals("")) {
+				r.setText("Krótki opis produktu oraz przebiegu wdrożenia – wyszczególnienie procesów, jakie miały miejsce, każdy proces po 2-3 zdania opisu");
+			} else {
+				r.setText(report.getIntroduction());
+			}
 
 			paragraph = document.createParagraph();
 			r = paragraph.createRun();

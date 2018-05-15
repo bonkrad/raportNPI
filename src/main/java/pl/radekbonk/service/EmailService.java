@@ -19,9 +19,10 @@ public class EmailService {
 	public void sendMessage(TaskEntity task) {
 		ReportEntity report = reportsService.findOne(task.getReport().getId());
 
+
 		SimpleMailMessage message = new SimpleMailMessage();
 		message.setFrom("powiadomienie@radekbonk.pl");
-		message.setTo("bonk.r@assel.pl");
+		message.setTo(task.getResponsibleWorker());
 		message.setSubject("NPI - Zadanie do wykonania w produkcie: " + report.getProductId());
 		message.setText("Zadanie: " + task.getDescription() +
 				"\n" + "Wymagana data: " + task.getRequiredDate().getTime());

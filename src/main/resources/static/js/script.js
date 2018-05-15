@@ -222,6 +222,7 @@ $(document).ready(function() {
     function saveSummary() {
         var saveReportUrl = $('#summaryBlock').attr('value');
         var formData = new FormData();
+        formData.append('introduction', $('#introductionTextArea').val());
         formData.append('summary', $('#economicalSummaryTextArea').val());
         formData.append('conclusion', $('#summaryTextArea').val());
         formData.append('productEngineer', $('#productEngineerTextArea').val());
@@ -285,6 +286,10 @@ $(document).ready(function() {
     });
 
     $('#summaryBlock').on('blur', '#qualityEngineerTextArea', function() {
+        saveSummary();
+    });
+
+    $('#summaryBlock').on('blur', '#introductionTextArea', function() {
         saveSummary();
     });
 

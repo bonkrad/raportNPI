@@ -116,7 +116,7 @@ public class ReportController {
 	@PostMapping(value = "/report", params = {"productId"})
 	@ResponseBody
 	public String createReport(@RequestParam(value = "productId") long productId, @RequestParam(value = "copyLast") boolean copyLast, Authentication authentication) {
-		ReportEntity newReport = new ReportEntity(reportsService.getNewRevision(productId), authentication.getPrincipal().toString().split(Pattern.quote("\\"))[1], "", new ArrayList<>(), "", "", productId,"","","");
+		ReportEntity newReport = new ReportEntity(reportsService.getNewRevision(productId), authentication.getPrincipal().toString().split(Pattern.quote("\\"))[1], "", new ArrayList<>(), "", "", productId, "", "", "","");
 		//newReport.setProduct(productsService.getProductById(productId));
 		reportsService.save(newReport, copyLast, productId);
 		return "/products?productId=" + productId + "&reportId=" + newReport.getId();
@@ -126,6 +126,7 @@ public class ReportController {
 	@GetMapping(value = "/report", params = {"reportId"})
 	public String viewReport(@RequestParam(value = "reportId") long reportId, Model model) {
 		ReportEntity report = reportsService.findOne(reportId);
+		model.addAttribute("introduction", report.getIntroduction());
 		model.addAttribute("summary", report.getSummary());
 		model.addAttribute("conclusion", report.getConclusion());
 		model.addAttribute("productEngineer", report.getProductEngineer());
@@ -137,8 +138,9 @@ public class ReportController {
 	}
 
 	@PostMapping(value = "/report", params = {"reportId"})
-	public ModelAndView saveReport(@RequestParam(value = "reportId") long reportId, @RequestParam(value = "summary") String summary, @RequestParam(value = "conclusion") String conclusion, @RequestParam(value = "productEngineer") String productEngineer, @RequestParam(value = "processEngineer") String processEngineer, @RequestParam(value = "qualityEngineer") String qualityEngineer, @RequestParam(value = "attachment[]", required = false) MultipartFile[] attachments, @RequestParam(value = "attachmentsToDelete[]", required = false) String[] attachmentsToDelete) {
+	public ModelAndView saveReport(@RequestParam(value = "reportId") long reportId, @RequestParam(value = "introduction") String introduction, @RequestParam(value = "summary") String summary, @RequestParam(value = "conclusion") String conclusion, @RequestParam(value = "productEngineer") String productEngineer, @RequestParam(value = "processEngineer") String processEngineer, @RequestParam(value = "qualityEngineer") String qualityEngineer, @RequestParam(value = "attachment[]", required = false) MultipartFile[] attachments, @RequestParam(value = "attachmentsToDelete[]", required = false) String[] attachmentsToDelete) {
 		ReportEntity reportEntity = reportsService.findOne(reportId);
+		reportEntity.setIntroduction(introduction);
 		reportEntity.setSummary(summary);
 		reportEntity.setConclusion(conclusion);
 		reportEntity.setProductEngineer(productEngineer);
@@ -165,12 +167,12 @@ public class ReportController {
 		}
 	}
 
-	@PostMapping(value = "generateWord", params = {"reportId","language"})
-	public void getWordPolish(@RequestParam("reportId") long reportId,@RequestParam("language") String language, HttpServletResponse response) {
+	@PostMapping(value = "generateWord", params = {"reportId", "language"})
+	public void getWordPolish(@RequestParam("reportId") long reportId, @RequestParam("language") String language, HttpServletResponse response) {
 		String fileName = reportsService.getReportNameZip(reportId);
 		System.out.println(language);
 		try {
-			InputStream is = new FileInputStream(reportsService.generateWord(reportId,language));
+			InputStream is = new FileInputStream(reportsService.generateWord(reportId, language));
 			response.setContentType("application/zip");
 			response.setHeader("Content-Disposition", "attachment; filename=" + fileName);
 			IOUtils.copy(is, response.getOutputStream());

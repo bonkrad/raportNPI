@@ -24,6 +24,7 @@ public class ReportEntity {
 	@ElementCollection
 	private List<String> attachmentSrc;
 
+	private String introduction;
 	private String summary;
 	private String conclusion;
 	private String productEngineer;
@@ -39,7 +40,7 @@ public class ReportEntity {
 
 	}
 
-	public ReportEntity(BigDecimal revision, String author, String imgSrc, List<String> attachmentSrc, String summary, String conclusion, long productId, String productEngineer, String processEngineer, String qualityEngineer) {
+	public ReportEntity(BigDecimal revision, String author, String imgSrc, List<String> attachmentSrc, String summary, String conclusion, long productId, String productEngineer, String processEngineer, String qualityEngineer, String introduction) {
 		this.revision = revision;
 		this.author = author;
 		this.imgSrc = imgSrc;
@@ -51,6 +52,7 @@ public class ReportEntity {
 		this.productEngineer = productEngineer;
 		this.processEngineer = processEngineer;
 		this.qualityEngineer = qualityEngineer;
+		this.introduction = introduction;
 	}
 
 	public long getId() {
@@ -147,5 +149,13 @@ public class ReportEntity {
 
 	public void setQualityEngineer(String qualityEngineer) {
 		this.qualityEngineer = qualityEngineer;
+	}
+
+	public String getIntroduction() {
+		return introduction;
+	}
+
+	public void setIntroduction(String introduction) {
+		this.introduction = introduction;
 	}
 }

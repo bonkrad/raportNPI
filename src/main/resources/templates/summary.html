@@ -7,6 +7,16 @@
 <body>
 <div th:fragment="summaryFragment">
     <div class="row">
+        <div class="col-sm">
+            <div class="form-group">
+                <label for="introductionTextArea">Wstęp</label>
+                <textarea class="form-control" th:value="@{/report(reportId=${reportId})}"
+                          placeholder="-Krótki opis produktu oraz przebiegu wdrożenia" id="introductionTextArea"
+                          rows="5" th:text="${introduction}"></textarea>
+            </div>
+        </div>
+    </div>
+    <div class="row">
         <div class="col-sm-8">
             <div class="form-group">
                 <label for="economicalSummaryTextArea">Podsumowanie ekonomiczne</label>
