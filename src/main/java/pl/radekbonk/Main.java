@@ -1,9 +1,13 @@
 package pl.radekbonk;
 
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Bean;
+import pl.radekbonk.service.Octopart;
 
 @SpringBootApplication
 public class Main {
@@ -29,7 +33,7 @@ public class Main {
 	}*/
 
 	public static String getUploadPath() {
-		if(System.getProperty("os.name").contains("Windows")) {
+		if (System.getProperty("os.name").contains("Windows")) {
 			return "H://disk/";
 		} else {
 			return "/home/pi/raport/disk/";
@@ -56,5 +60,62 @@ public class Main {
 			System.out.println(jsonObject.get("ITEMNAME"));
 		};
 	}*/
+
+	//MouserWSDL
+	/*@Bean
+	public CommandLineRunner lookup(ComponentClient componentClient) {
+		return (args) -> {
+			String partNumber = "C4532X7R1H475K200KB";
+
+			if (args.length > 0) {
+				partNumber = args[0];
+			}
+			SearchByPartNumberResponse response = componentClient.searchByPartNumber(partNumber);
+			//List<MouserPart> mouserPartList = componentClient.getResultParts(id);
+
+			System.out.println(response);
+
+		};
+	}*/
+
+	//Octopart
+	@Bean
+	public CommandLineRunner lookup() {
+		return (args) -> {
+			String octopartUrlBase = "http://octopart.com/api/v3";
+			String octopartUrlEndpoint = "parts/match";
+			String apiKey = "0de2cfb1";
+			String partNumber = "C4532X7R1H475K200KB";
+
+			/*String url = "https://octopart.com/api/v3/parts/match";
+
+			HashMap<String, String> mpn = new HashMap<>();
+			mpn.put("mpn",partNumber);
+
+			JSONArray mpns = new JSONArray();
+			mpns.put(mpn);
+
+
+			UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(url)
+					.queryParam("apikey",apiKey)
+					.queryParam("queries",mpns)
+					.queryParam("pretty_print",true);
+//					.queryParam("include[]","description");
+
+			RestTemplate restTemplate  = new RestTemplate();
+			System.out.println(builder.toUriString());
+			String response = restTemplate.getForObject(builder.toUriString(), String.class);
+			System.out.println(response);*/
+
+			Octopart.setApiKey(apiKey);
+			Octopart octopart = Octopart.getInstance();
+
+			JSONObject object = octopart.searchParts(partNumber);
+
+			//System.out.println(object);
+			System.out.println(object.getJSONArray("results").getJSONObject(0).getJSONArray("items").getJSONObject(0).getJSONObject("specs").getJSONObject("case_package").get("display_value"));
+
+		};
+	}
 
 }

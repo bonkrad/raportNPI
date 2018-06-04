@@ -141,7 +141,7 @@
             <plugin>
                 <groupId>org.jvnet.jaxb2.maven2</groupId>
                 <artifactId>maven-jaxb2-plugin</artifactId>
-                <version>0.13.1</version>
+                <version>0.13.2</version>
                 <executions>
                     <execution>
                         <goals>
@@ -155,6 +155,27 @@
                     <schemas>
                         <schema>
                             <url>http://systemcorewcf:666/GetDetails.svc?singleWsdl</url>
+                        </schema>
+                    </schemas>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.jvnet.jaxb2.maven2</groupId>
+                <artifactId>maven-jaxb2-plugin</artifactId>
+                <version>0.13.2</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <schemaLanguage>WSDL</schemaLanguage>
+                    <generatePackage>pl.radekbonk.mouser</generatePackage>
+                    <schemas>
+                        <schema>
+                            <url>http://api.mouser.com/service/searchapi.asmx?wsdl</url>
                         </schema>
                     </schemas>
                 </configuration>
