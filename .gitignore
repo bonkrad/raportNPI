@@ -22,6 +22,9 @@
 hs_err_pid*
 .idea/
 
+# Properties and config files
 *.properties
 
 
+document.docx
+assel.jpg
